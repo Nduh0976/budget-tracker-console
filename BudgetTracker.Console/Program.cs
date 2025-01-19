@@ -33,8 +33,7 @@ static int DisplayMenuAndGetSelection()
     {
         DrawMenu(cursorPosition, selectedOption);
 
-        var key = Console.ReadKey(false).Key;
-        switch (key)
+        switch (Console.ReadKey(false).Key)
         {
             case ConsoleKey.DownArrow:
                 selectedOption = (selectedOption + 1) % MenuItems.ActiveMenuItems.Count;
