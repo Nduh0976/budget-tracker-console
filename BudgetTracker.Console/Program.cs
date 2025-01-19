@@ -1,44 +1,11 @@
-﻿using BudgetTracker.Console.Constants;
+﻿using System.Text;
+using BudgetTracker.Console.Constants;
 
 ConfigureConsole();
 
-var cursorPosition = Console.GetCursorPosition();
-var selectedOption = 0;
-var isSelected = false;
+var selectedMenuOption = DisplayMenuAndGetSelection();
 
-while (!isSelected)
-{
-    Console.SetCursorPosition(cursorPosition.Left, cursorPosition.Top);
-
-    var selectedOptionMarker = $"✅  {ForeColorConfig.GreenForeColor}";
-    for (var i = 0; i < MenuItems.ActiveMenuItems.Count; i++)
-    {
-        Console.WriteLine($"{(selectedOption == i ? selectedOptionMarker : "    ")}{MenuItems.ActiveMenuItems.ElementAt(i)}\u001b[0m");
-    }
-
-    var key = Console.ReadKey(false);
-
-    switch (key.Key)
-    {
-        case ConsoleKey.DownArrow:
-            selectedOption = selectedOption == MenuItems.ActiveMenuItems.Count - 1
-                ? 0
-                : selectedOption + 1;
-            break;
-
-        case ConsoleKey.UpArrow:
-            selectedOption = selectedOption == 0
-                ? MenuItems.ActiveMenuItems.Count - 1
-                : selectedOption - 1;
-            break;
-
-        case ConsoleKey.Enter:
-            isSelected = true;
-            break;
-    }
-}
-
-Console.WriteLine($"{ForeColorConfig.GreenForeColor}You selected {MenuItems.ActiveMenuItems.ElementAt(selectedOption)}{ForeColorConfig.ForeColorReset}");
+Console.WriteLine($"{ForeColorConfig.GreenForeColor}You selected {MenuItems.ActiveMenuItems.ElementAt(selectedMenuOption)}{ForeColorConfig.ForeColorReset}");
 
 static void ConfigureConsole()
 {
@@ -48,4 +15,56 @@ static void ConfigureConsole()
     Console.ResetColor();
     Console.WriteLine($"\nUse ⬆ and ⬇ to navigate and key {ForeColorConfig.GreenForeColor}Enter/Return{ForeColorConfig.ForeColorReset} to select.");
     Console.CursorVisible = false;
+}
+
+static int DisplayMenuAndGetSelection()
+{
+    if (MenuItems.ActiveMenuItems == null || MenuItems.ActiveMenuItems.Count == 0)
+    {
+        Console.WriteLine("No menu items available.");
+        return -1; // Indicates no selection
+    }
+
+    var cursorPosition = Console.GetCursorPosition();
+    var selectedOption = 0;
+    var isSelected = false;
+
+    while (!isSelected)
+    {
+        DrawMenu(cursorPosition, selectedOption);
+
+        var key = Console.ReadKey(false).Key;
+        switch (key)
+        {
+            case ConsoleKey.DownArrow:
+                selectedOption = (selectedOption + 1) % MenuItems.ActiveMenuItems.Count;
+                break;
+
+            case ConsoleKey.UpArrow:
+                selectedOption = (selectedOption - 1 + MenuItems.ActiveMenuItems.Count) % MenuItems.ActiveMenuItems.Count;
+                break;
+
+            case ConsoleKey.Enter:
+                isSelected = true;
+                break;
+        }
+    }
+
+    return selectedOption;
+}
+
+static void DrawMenu((int Left, int Top) cursorPosition, int selectedOption)
+{
+    Console.SetCursorPosition(cursorPosition.Left, cursorPosition.Top);
+
+    var menuBuilder = new StringBuilder();
+    var selectedOptionMarker = $"✅  {ForeColorConfig.GreenForeColor}";
+
+    for (var i = 0; i < MenuItems.ActiveMenuItems.Count; i++)
+    {
+        var marker = selectedOption == i ? selectedOptionMarker : "    ";
+        menuBuilder.AppendLine($"{marker}{MenuItems.ActiveMenuItems.ElementAt(i)}{ForeColorConfig.ForeColorReset}");
+    }
+
+    Console.WriteLine(menuBuilder.ToString());
 }
