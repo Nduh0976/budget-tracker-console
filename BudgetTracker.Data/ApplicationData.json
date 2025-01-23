@@ -1,0 +1,58 @@
+{
+  "Users": [
+    {
+      "Id": 1,
+      "Name": "John Doe",
+      "Username": "JohnD"
+    },
+    {
+      "Id": 2,
+      "Name": "Jane Smith",
+      "Username": "JaneS"
+    }
+  ],
+  "Budgets": [
+    {
+      "Id": 1,
+      "UserId": 1,
+      "StartDate": "2025-01-01T00:00:00",
+      "EndDate": "2025-01-31T00:00:00",
+      "Amount": 2000.00
+    },
+    {
+      "Id": 2,
+      "UserId": 2,
+      "StartDate": "2025-01-01T00:00:00",
+      "EndDate": "2025-01-31T00:00:00",
+      "Amount": 1500.00
+    }
+  ],
+  "Categories": [
+    {
+      "Id": 1,
+      "Name": "Food"
+    },
+    {
+      "Id": 2,
+      "Name": "Rent"
+    }
+  ],
+  "Expenses": [
+    {
+      "Id": 1,
+      "BudgetId": 1,
+      "CategoryId": 1,
+      "Amount": 50.0,
+      "Date": "2025-01-05T00:00:00",
+      "Description": "Lunch"
+    },
+    {
+      "Id": 2,
+      "BudgetId": 2,
+      "CategoryId": 2,
+      "Amount": 500.0,
+      "Date": "2025-01-10T00:00:00",
+      "Description": "Rent Payment"
+    }
+  ]
+}
