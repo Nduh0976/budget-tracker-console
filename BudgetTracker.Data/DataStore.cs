@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BudgetTracker.Models;
+using Newtonsoft.Json;
 
 namespace BudgetTracker.Data
 {
@@ -6,14 +7,41 @@ namespace BudgetTracker.Data
     {
         private readonly string _filePath = AppDomain.CurrentDomain.BaseDirectory.Replace(@"\BudgetTracker.Console\bin\Debug\net8.0\", @"\BudgetTracker.Data\ApplicationData.json");
 
-        public ApplicationData ApplicationData { get; set; }
+        private ApplicationData _applicationData;
 
         public DataStore()
         {
-            ApplicationData = new ApplicationData();
+            _applicationData = new ApplicationData();
+            LoadData();
         }
 
-        public void LoadData()
+        public void AddUser(User newUser)
+        {
+            _applicationData.Users.Add(newUser);
+        }
+
+        public IEnumerable<User> GetUsers()
+        {
+            return _applicationData.Users;
+        }
+        
+        public User? GetUserById(int userId)
+        {
+            return _applicationData.Users.FirstOrDefault(u => u.Id == userId);
+        }
+
+        public bool UserExists(string username)
+        {
+            return _applicationData.Users.Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void UpdateData()
+        {
+            var jsonData = JsonConvert.SerializeObject(_applicationData, Formatting.Indented);
+            File.WriteAllText(_filePath, jsonData);
+        }
+
+        private void LoadData()
         {
             if (File.Exists(_filePath))
             {
@@ -22,7 +50,7 @@ namespace BudgetTracker.Data
 
                 if (appData != null)
                 {
-                    ApplicationData = appData;
+                    _applicationData = appData;
                 }
             }
             else

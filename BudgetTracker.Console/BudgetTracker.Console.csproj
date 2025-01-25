@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BudgetTracker.Services\BudgetTracker.Services.csproj" />
+  </ItemGroup>
+
 </Project>

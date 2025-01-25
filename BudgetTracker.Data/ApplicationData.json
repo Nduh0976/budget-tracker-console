@@ -2,13 +2,38 @@
   "Users": [
     {
       "Id": 1,
-      "Name": "John Doe",
-      "Username": "JohnD"
+      "Username": "JohnD",
+      "Name": "John Doe"
     },
     {
       "Id": 2,
-      "Name": "Jane Smith",
-      "Username": "JaneS"
+      "Username": "JaneS",
+      "Name": "Jane Smith"
+    },
+    {
+      "Id": 3,
+      "Username": "Ndu",
+      "Name": "Ndumiso M"
+    },
+    {
+      "Id": 4,
+      "Username": "Nae",
+      "Name": "Natalie"
+    },
+    {
+      "Id": 5,
+      "Username": "Sah",
+      "Name": "Sanele M"
+    },
+    {
+      "Id": 6,
+      "Username": "Bean",
+      "Name": "Johnny English"
+    },
+    {
+      "Id": 7,
+      "Username": "ClintE",
+      "Name": "Clint Eastwood"
     }
   ],
   "Budgets": [
