@@ -7,7 +7,7 @@ namespace BudgetTracker.Data
     {
         private readonly string _filePath = AppDomain.CurrentDomain.BaseDirectory.Replace(@"\BudgetTracker.Console\bin\Debug\net8.0\", @"\BudgetTracker.Data\ApplicationData.json");
 
-        private ApplicationData _applicationData { get; set; }
+        private ApplicationData _applicationData;
 
         public DataStore()
         {
