@@ -40,6 +40,7 @@
     {
       "Id": 1,
       "UserId": 1,
+      "Name": "Jan 2025 Monthly Budget",
       "StartDate": "2025-01-01T00:00:00",
       "EndDate": "2025-01-31T00:00:00",
       "Amount": 2000.00
@@ -47,6 +48,7 @@
     {
       "Id": 2,
       "UserId": 2,
+      "Name": "Life Expenses",
       "StartDate": "2025-01-01T00:00:00",
       "EndDate": "2025-01-31T00:00:00",
       "Amount": 1500.00
