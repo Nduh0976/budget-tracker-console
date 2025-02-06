@@ -36,7 +36,7 @@ namespace BudgetTracker.Services
                 return new Response<User>
                 {
                     Success = false,
-                    Message = "Username cannot be empty or whitespace.",
+                    Message = "Name cannot be empty or whitespace.",
                 };
             }
 
@@ -118,14 +118,14 @@ namespace BudgetTracker.Services
 
         public IList<string> GetUsersAsTable()
         {
-            var userDecriptions = new List<string>();
+            var userDescriptions = new List<string>();
 
             foreach (var user in GetUsers())
             {
-                userDecriptions.Add(user.ToString());
+                userDescriptions.Add(user.ToString());
             }
 
-            return userDecriptions;
+            return userDescriptions;
         }
     }
 }

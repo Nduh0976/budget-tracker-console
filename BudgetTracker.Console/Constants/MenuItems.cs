@@ -17,14 +17,14 @@
         public const string AddUser = "Add User";
         public const string SelectUser = "Select Existing User";
 
+
+        public const string Budgets = "Budgets";
+        public const string ViewBudgets = "View Budgets";
+        public const string CreateBudget = "Create Budget";
+
         public static readonly IList<string> ActiveMenuItems =
         [
-            AddExpense,
-            ViewExpenses,
-            EditExpense,
-            DeleteExpense,
-            SetMonthlyBudget,
-            ViewBudgetSummary,
+            Budgets,
             AddFilterAndSortExpenses,
             ManageCategories,
             SwitchUser,
@@ -36,6 +36,26 @@
         [
             AddUser,
             SelectUser
+        ];
+
+        public static readonly IList<string> BudgetsMenuItems =
+        [
+            ViewBudgets,
+            CreateBudget
+        ];
+
+        public static readonly IList<string> SelectedBudgetMenuItems =
+        [
+            AddExpense,
+            ViewExpenses,
+            SetMonthlyBudget,
+            ViewBudgetSummary
+        ];
+
+        public static readonly IList<string> SelectedExpenseMenuItems =
+        [
+            EditExpense,
+            DeleteExpense
         ];
     }
 }

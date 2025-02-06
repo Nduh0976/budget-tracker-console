@@ -13,8 +13,8 @@ namespace BudgetTracker.Console
 
             // Add top border
             welcomeMessage.AppendLine(new string('*', 50));
-            welcomeMessage.AppendLine("*            Welcome to Budget Tracker!            *");
-            welcomeMessage.AppendLine("*        Take control of your finances!            *");
+            welcomeMessage.AppendLine("*          Welcome to Budget Tracker!            *");
+            welcomeMessage.AppendLine("*        Take control of your finances!          *");
             welcomeMessage.AppendLine(new string('*', 50));
 
             // Add date
@@ -27,7 +27,7 @@ namespace BudgetTracker.Console
             }
             else
             {
-                welcomeMessage.AppendLine("No active user found. Please select or create a user.");
+                welcomeMessage.AppendLine("No active user found. Select or create a user.");
             }
 
             // Add bottom border
