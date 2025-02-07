@@ -22,6 +22,11 @@
         public const string ViewBudgets = "View Budgets";
         public const string CreateBudget = "Create Budget";
 
+        public const string ViewCategories = "View Categories";
+        public const string CreateCategory = "Create Category";
+        public const string EditCategory = "Edit Category";
+        public const string DeleteCategory = "Delete Category";
+
         public static readonly IList<string> ActiveMenuItems =
         [
             Budgets,
@@ -43,6 +48,12 @@
             ViewBudgets,
             CreateBudget
         ];
+        
+        public static readonly IList<string> CategoriesMenuItems =
+        [
+            ViewCategories,
+            CreateCategory
+        ];
 
         public static readonly IList<string> SelectedBudgetMenuItems =
         [
@@ -50,6 +61,12 @@
             ViewExpenses,
             SetMonthlyBudget,
             ViewBudgetSummary
+        ];
+
+        public static readonly IList<string> SelectedCategoryMenuItems =
+        [
+            EditCategory,
+            DeleteCategory
         ];
 
         public static readonly IList<string> SelectedExpenseMenuItems =

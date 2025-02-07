@@ -29,6 +29,11 @@ namespace BudgetTracker.Data
             _applicationData.Budgets.Add(budget);
         }
 
+        public void AddCategory(Category category)
+        {
+            _applicationData.Categories.Add(category);
+        }
+
         public void AddExpense(Expense expense)
         {
             _applicationData.Expenses.Add(expense);
@@ -89,6 +94,11 @@ namespace BudgetTracker.Data
             return _applicationData.Users.FirstOrDefault(u => u.Id == userId);
         }
 
+        public bool CategoryExists(string name)
+        {
+            return _applicationData.Categories.Any(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
         public bool UserExists(string username)
         {
             return _applicationData.Users.Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
@@ -121,6 +131,23 @@ namespace BudgetTracker.Data
             {
                 Console.WriteLine("Data file not found.");
             }
+        }
+
+        public bool RemoveCategory(int categoryId)
+        {
+            var categoryToRemove = _applicationData.Categories.FirstOrDefault(c => c.Id == categoryId);
+            var hasDependancies = _applicationData.Expenses.Any(e => e.CategoryId == categoryId);
+
+            if (categoryToRemove != null && !hasDependancies)
+            {
+
+                _applicationData.Categories.Remove(categoryToRemove);
+                UpdateData();
+
+                return true;
+            }
+
+            return false;
         }
 
         public bool RemoveExpense(int expenseId)
