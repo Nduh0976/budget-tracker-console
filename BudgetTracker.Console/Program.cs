@@ -8,6 +8,7 @@ var appRunning = true;
 var userService = new UserService();
 var budgetService = new BudgetService();
 var expenseService = new ExpenseService();
+var categoryService = new CategoryService();
 
 ConfigureConsole();
 
@@ -47,6 +48,21 @@ while (appRunning)
             else if (selectedBudgetMenuOption == MenuItems.CreateBudget)
             {
                 CreateBudget();
+            }
+
+            break;
+
+        case MenuItems.ManageCategories:
+            var selectedCategoryMenuOption = DisplayMenuAndGetSelection(MenuItems.CategoriesMenuItems);
+
+            if (selectedCategoryMenuOption == MenuItems.ViewCategories)
+            {
+                ViewCategorySelection();
+                selectedActiveMenuOption = DisplayMenuAndGetSelection(MenuItems.ActiveMenuItems);
+            }
+            else if (selectedCategoryMenuOption == MenuItems.CreateCategory)
+            {
+                CreateCategory();
             }
 
             break;
@@ -167,6 +183,15 @@ void CreateBudget()
     Console.WriteLine(response.Message);
 }
 
+void CreateCategory()
+{
+    var name = GetUserInput("Enter name:");
+
+    var response = categoryService.CreateCategory(name);
+
+    Console.WriteLine(response.Message);
+}
+
 void AddExpense()
 {
     var description = GetUserInput("Enter description:");
@@ -182,10 +207,40 @@ void AddExpense()
 int GetExpenseCategory()
 {
     Console.WriteLine("Select Category:");
-    var categoriesTable = expenseService.GetCategoriesAsTable();
+    var categoriesTable = categoryService.GetCategoriesAsTable();
     Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
 
     return int.Parse(DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+}
+
+void ViewCategorySelection()
+{
+    // Print table header
+    Console.WriteLine(new string('=', 85));
+    Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
+    Console.WriteLine(new string('-', 85));
+
+    var categoriesTable = categoryService.GetCategoriesAsTable();
+
+    var selectedCategoryId = int.Parse(DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+
+    categoryService.SetSelectedCategoryById(selectedCategoryId);
+
+    if (categoryService.SelectedCategory != null)
+    {
+        var selectedBudgetMenu = DisplayMenuAndGetSelection(MenuItems.SelectedCategoryMenuItems);
+
+        switch (selectedBudgetMenu)
+        {
+            case MenuItems.EditCategory:
+                UpdateCategory();
+                break;
+
+            case MenuItems.DeleteCategory:
+                DeleteCategory();
+                break;
+        }
+    }
 }
 
 void ViewBudgetSelection()
@@ -245,6 +300,30 @@ void ViewExpenseSelection(int budgetId)
     }
 }
 
+void DeleteCategory()
+{
+    Console.Write("Are you sure you want to delete this category? (Y/N): ");
+    var confirmation = Console.ReadLine()?.Trim().ToUpper();
+
+    if (confirmation == "Y")
+    {
+        var result = categoryService.DeleteCategory();
+
+        if (result)
+        {
+            Console.WriteLine("Category removed successfully.");
+        }
+        else
+        {
+            Console.WriteLine("There was a problem deleting the category, there may be dependencies.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Deletion canceled.");
+    }
+}
+
 void DeleteExpense(int expenseId)
 {
     Console.Write("Are you sure you want to delete this expense? (Y/N): ");
@@ -269,11 +348,20 @@ void DeleteExpense(int expenseId)
     }
 }
 
+void UpdateCategory()
+{
+    var name = GetUserInput("Enter new name:");
+
+    var response = categoryService.UpdateCategory(name ?? string.Empty);
+
+    Console.WriteLine(response.Message);
+}
+
 void UpdateUser()
 {
     var name = GetUserInput("Enter new name:");
 
-    var response = userService.UpdateUser(userService.ActiveUser.Id, name ?? string.Empty);
+    var response = userService.UpdateUser(name ?? string.Empty);
     if (response.Success)
     {
         userService.ActiveUser = response.Data ?? new User() { Name = string.Empty, Username = string.Empty };

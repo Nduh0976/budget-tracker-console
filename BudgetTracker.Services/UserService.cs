@@ -73,7 +73,7 @@ namespace BudgetTracker.Services
             };
         }
 
-        public Response<User> UpdateUser(int userId, string name)
+        public Response<User> UpdateUser(string name)
         {
             if (string.IsNullOrWhiteSpace(name.Trim()))
             {
@@ -84,7 +84,7 @@ namespace BudgetTracker.Services
                 };
             }
 
-            var user = _dataStore.GetUserById(userId);
+            var user = _dataStore.GetUserById(ActiveUser.Id);
 
             if (user != null)
             {
@@ -106,11 +106,6 @@ namespace BudgetTracker.Services
             };
         }
 
-        public bool IsUsernameValid(string username)
-        {
-            return !_dataStore.UserExists(username);
-        }
-
         public void SetActiveUserById(int selectedUserId)
         {
             ActiveUser = _dataStore.GetUserById(selectedUserId)!;
@@ -126,6 +121,11 @@ namespace BudgetTracker.Services
             }
 
             return userDescriptions;
+        }
+
+        private bool IsUsernameValid(string username)
+        {
+            return !_dataStore.UserExists(username);
         }
     }
 }
