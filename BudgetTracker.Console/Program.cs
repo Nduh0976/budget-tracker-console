@@ -329,7 +329,6 @@ void ViewExpenseSelection(IEnumerable<Expense> expenses)
 
 IEnumerable<Expense> GetSortedExpenses(IEnumerable<Expense> expenses)
 {
-    // Prompt user for sorting option
     var sortOption = GetSortOption();
     switch (sortOption)
     {
