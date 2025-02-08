@@ -38,6 +38,15 @@ while (appRunning)
             selectedActiveMenuOption = DisplayMenuAndGetSelection(MenuItems.ActiveMenuItems);
             break;
 
+        case MenuItems.DeleteUser:
+            DeleteUser();
+
+            selectedMenuOption = DisplayMenuAndGetSelection(MenuItems.UserMenuItems);
+            ConfigureUser(selectedMenuOption);
+
+            selectedActiveMenuOption = DisplayMenuAndGetSelection(MenuItems.ActiveMenuItems);
+            break;
+
         case MenuItems.Budgets:
             var selectedBudgetMenuOption = DisplayMenuAndGetSelection(MenuItems.BudgetsMenuItems);
 
@@ -548,6 +557,39 @@ void DeleteExpense(int expenseId)
         else
         {
             Console.WriteLine("There was a problem deleting the expense.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Deletion canceled.");
+    }
+}
+
+void DeleteUser()
+{
+    var selectedUser = userService.ActiveUser;
+
+    if (!selectedUser.Exists())
+    {
+        Console.WriteLine("No user selected.");
+        return;
+    }
+
+    Console.Write("Are you sure you want to delete the current user? (Y/N): ");
+    var confirmation = Console.ReadLine()?.Trim().ToUpper();
+
+    if (confirmation == "Y")
+    {
+        budgetService.DeleteBudgetByUserId(selectedUser.Id);
+        var result = userService.RemoveUser();
+
+        if (result)
+        {
+            Console.WriteLine("User removed successfully.");
+        }
+        else
+        {
+            Console.WriteLine("There was a problem deleting the user.");
         }
     }
     else
