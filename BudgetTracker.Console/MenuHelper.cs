@@ -6,7 +6,7 @@ namespace BudgetTracker.Console
 {
     public static class MenuHelper
     {
-        public static string GetWelcomeMessage(User? activeUser = null)
+        public static string GetWelcomeMessage(string activeUserName)
         {
             var currentDate = DateTime.Now.ToString("dddd, dd MMMM yyyy");
             var welcomeMessage = new StringBuilder();
@@ -21,9 +21,9 @@ namespace BudgetTracker.Console
             welcomeMessage.AppendLine($"\nToday is: {currentDate}");
 
             // Add active user info if available
-            if (activeUser != null)
+            if (!string.IsNullOrEmpty(activeUserName))
             {
-                welcomeMessage.AppendLine($"Active User: {activeUser.Name}");
+                welcomeMessage.AppendLine($"Active User: {activeUserName}");
             }
             else
             {

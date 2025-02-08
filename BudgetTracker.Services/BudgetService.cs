@@ -1,18 +1,19 @@
-﻿using BudgetTracker.Data;
+﻿using BudgetTracker.Data.Interfaces;
 using BudgetTracker.Models;
+using BudgetTracker.Services.Interfaces;
 
 namespace BudgetTracker.Services
 {
-    public class BudgetService
+    public class BudgetService : IBudgetService
     {
-        public Budget SelectedBudget { get; set; }
+        private Budget selectedBudget { get; set; }
 
-        private readonly DataStore _dataStore;
+        private readonly IDataStore _dataStore;
 
-        public BudgetService()
+        public BudgetService(IDataStore dataStore)
         {
-            SelectedBudget = new Budget() { Name = string.Empty };
-            _dataStore = new DataStore();
+            selectedBudget = new Budget() { Name = string.Empty };
+            _dataStore = dataStore;
         }
 
         public Response<Budget> CreateBudget(int userId, string? name, DateTime startDate, DateTime endDate, decimal amount)
@@ -44,15 +45,9 @@ namespace BudgetTracker.Services
                 };
             }
 
-            var budgets = _dataStore.GetBudgets();
-
-            var newId = budgets.Any()
-                ? budgets.Max(b => b.Id) + 1
-                : 1;
-
             var newBudget = new Budget
             {
-                Id = newId,
+                Id = _dataStore.GenerateNextBudgetId(),
                 UserId = userId,
                 Name = name,
                 StartDate = startDate,
@@ -61,7 +56,6 @@ namespace BudgetTracker.Services
             };
 
             _dataStore.AddBudget(newBudget);
-            _dataStore.UpdateData();
 
             return new Response<Budget>
             {
@@ -69,6 +63,17 @@ namespace BudgetTracker.Services
                 Message = $"Budget '{name}' has been successfully created.",
                 Data = newBudget
             };
+        }
+
+        public void DeleteBudgetByUserId(int userId)
+        {
+            var budgets = _dataStore.GetBudgetsByUserId(userId).ToList();
+
+            foreach (var budgetId in budgets.Select(b => b.Id))
+            {
+                _dataStore.RemoveExpensesByBudgetId(budgetId);
+                _dataStore.RemoveBudget(budgetId);
+            }
         }
 
         public IList<string> GetBudgetsAsTableByUserId(int userId)
@@ -83,32 +88,51 @@ namespace BudgetTracker.Services
             return budgetDescriptions;
         }
 
-        public void SetSelectedBudgetById(int budgetId)
+        public int GetSelectedBudgetId()
         {
-            SelectedBudget = _dataStore.GetBudgetById(budgetId)!;
+            return selectedBudget.Id;
         }
 
-        public decimal GetSelectedBudgetTotalSpent()
+        public decimal GetSelectedBudgetAmount()
         {
-            var expesnses = _dataStore.GetExpensesByBudgetId(SelectedBudget.Id);
-
-            return expesnses.Sum(e => e.Amount);
+            return selectedBudget.Amount;
         }
 
         public decimal GetSelectedBudgetRemainingBalance()
         {
-            return SelectedBudget.Amount - GetSelectedBudgetTotalSpent();
+            return selectedBudget.Amount - GetSelectedBudgetTotalSpent();
         }
 
-        public void DeleteBudgetByUserId(int userId)
+        public decimal GetSelectedBudgetTotalSpent()
         {
-            var budgets = _dataStore.GetBudgetsByUserId(userId).ToList();
+            var expenses = _dataStore.GetExpensesByBudgetId(selectedBudget.Id);
 
-            foreach (var budgetId in budgets.Select(b => b.Id))
-            {
-                _dataStore.RemoveExpensesByBudgetId(budgetId);
-                _dataStore.RemoveBudget(budgetId);
-            }
+            return expenses.Sum(e => e.Amount);
+        }
+
+        public string GetSelectedBudgetName()
+        {
+            return selectedBudget.Name;
+        }
+
+        public DateTime GetSelectedBudgetStartDate()
+        {
+            return selectedBudget.StartDate;
+        }
+
+        public DateTime GetSelectedBudgetEndDate()
+        {
+            return selectedBudget.EndDate;
+        }
+
+        public bool SelectedBudgetExists()
+        {
+            return selectedBudget.Exists();
+        }
+
+        public void SetSelectedBudgetById(int budgetId)
+        {
+            selectedBudget = _dataStore.GetBudgetById(budgetId)!;
         }
     }
 }

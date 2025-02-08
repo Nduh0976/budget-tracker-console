@@ -13,5 +13,5 @@
   <ItemGroup>
     <ProjectReference Include="..\BudgetTracker.Models\BudgetTracker.Models.csproj" />
   </ItemGroup>
-
+	
 </Project>

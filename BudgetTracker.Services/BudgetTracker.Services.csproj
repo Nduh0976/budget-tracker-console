@@ -11,4 +11,8 @@
     <ProjectReference Include="..\BudgetTracker.Models\BudgetTracker.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+
 </Project>
