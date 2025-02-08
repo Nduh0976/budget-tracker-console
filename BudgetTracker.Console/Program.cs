@@ -17,6 +17,7 @@ var selectedMenuOption = DisplayMenuAndGetSelection(MenuItems.UserMenuItems);
 ConfigureUser(selectedMenuOption);
 
 var selectedActiveMenuOption = DisplayMenuAndGetSelection(MenuItems.ActiveMenuItems);
+
 while (appRunning)
 {
 
@@ -266,21 +267,39 @@ void ViewBudgetSelection()
                 break;
 
             case MenuItems.ViewExpenses:
-                ViewExpenseSelection(selectedBudgetId);
+                ViewBudgetTotals();
+                ViewExpenseSelection();
                 break;
         }
     }
 }
 
-void ViewExpenseSelection(int budgetId)
+void ViewBudgetTotals()
+{
+    var amountUsed = budgetService.GetSelectedBudgetTotalSpent();
+    var remainingBalance = budgetService.GetSelectedBudgetRemainingBalance();
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine(new string('=', 90));
+    Console.WriteLine($" Budget Details - {budgetService.SelectedBudget.Name} ");
+    Console.WriteLine(new string('=', 90));
+    Console.ResetColor();
+
+    Console.WriteLine($"Total Amount: {budgetService.SelectedBudget.Amount}");
+    Console.WriteLine($"Amount Used:  {amountUsed}");
+    Console.WriteLine($"Remaining Balance: {remainingBalance}\n");
+}
+
+void ViewExpenseSelection()
 {
     // Print table header
     Console.WriteLine(new string('=', 90));
     Console.WriteLine($"    {"ID",-5} | {"Description",-30} | {"Category",-20} | {"Date",-12} | {"Amount",-10}");
     Console.WriteLine(new string('-', 90));
 
-    var expensesTable = expenseService.GetExpensesAsTableByBudgetId(budgetId);
+    var expensesTable = expenseService.GetExpensesAsTableByBudgetId(budgetService.SelectedBudget.Id);
 
+    
     var selectedExpenseId = int.Parse(DisplayMenuAndGetSelection(expensesTable)[0].ToString());
 
     if (selectedActiveMenuOption != null)
