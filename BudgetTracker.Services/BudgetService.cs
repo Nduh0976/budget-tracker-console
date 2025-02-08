@@ -87,5 +87,17 @@ namespace BudgetTracker.Services
         {
             SelectedBudget = _dataStore.GetBudgetById(budgetId)!;
         }
+
+        public decimal GetSelectedBudgetTotalSpent()
+        {
+            var expesnses = _dataStore.GetExpensesByBudgetId(SelectedBudget.Id);
+
+            return expesnses.Sum(e => e.Amount);
+        }
+
+        public decimal GetSelectedBudgetRemainingBalance()
+        {
+            return SelectedBudget.Amount - GetSelectedBudgetTotalSpent();
+        }
     }
 }
