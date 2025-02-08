@@ -1,12 +1,12 @@
-﻿using BudgetTracker.Models;
+﻿using BudgetTracker.Data.Interfaces;
+using BudgetTracker.Models;
 using Newtonsoft.Json;
 
 namespace BudgetTracker.Data
 {
-    public class DataStore
+    public class DataStore : IDataStore
     {
         private readonly string _filePath = AppDomain.CurrentDomain.BaseDirectory.Replace(@"\BudgetTracker.Console\bin\Debug\net8.0\", @"\BudgetTracker.Data\ApplicationData.json");
-
         private ApplicationData _applicationData;
 
         public DataStore()
@@ -27,21 +27,25 @@ namespace BudgetTracker.Data
         public void AddBudget(Budget budget)
         {
             _applicationData.Budgets.Add(budget);
+            UpdateData();
         }
 
         public void AddCategory(Category category)
         {
             _applicationData.Categories.Add(category);
+            UpdateData();
         }
 
         public void AddExpense(Expense expense)
         {
             _applicationData.Expenses.Add(expense);
+            UpdateData();
         }
 
         public void AddUser(User newUser)
         {
             _applicationData.Users.Add(newUser);
+            UpdateData();
         }
 
         public IEnumerable<Budget> GetBudgets()
@@ -88,7 +92,7 @@ namespace BudgetTracker.Data
         {
             return _applicationData.Users;
         }
-        
+
         public User? GetUserById(int userId)
         {
             return _applicationData.Users.FirstOrDefault(u => u.Id == userId);
@@ -104,43 +108,13 @@ namespace BudgetTracker.Data
             return _applicationData.Users.Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
         }
 
-        public void UpdateData()
-        {
-            var jsonData = JsonConvert.SerializeObject(_applicationData);
-            File.WriteAllText(_filePath, jsonData);
-        }
-
-        private void LoadData()
-        {
-            if (File.Exists(_filePath))
-            {
-                var jsonData = File.ReadAllText(_filePath);
-                var appData = JsonConvert.DeserializeObject<ApplicationData>(jsonData);
-
-                if (appData != null)
-                {
-                    _applicationData = appData;
-
-                    foreach (var expense in appData.Expenses)
-                    {
-                        expense.Category = appData.Categories.First(c =>  c.Id == expense.CategoryId);
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("Data file not found.");
-            }
-        }
-
         public bool RemoveCategory(int categoryId)
         {
             var categoryToRemove = _applicationData.Categories.FirstOrDefault(c => c.Id == categoryId);
-            var hasDependancies = _applicationData.Expenses.Any(e => e.CategoryId == categoryId);
+            var hasDependencies = _applicationData.Expenses.Any(e => e.CategoryId == categoryId);
 
-            if (categoryToRemove != null && !hasDependancies)
+            if (categoryToRemove != null && !hasDependencies)
             {
-
                 _applicationData.Categories.Remove(categoryToRemove);
                 UpdateData();
 
@@ -158,6 +132,7 @@ namespace BudgetTracker.Data
             {
                 _applicationData.Expenses.Remove(expenseToRemove);
                 UpdateData();
+
                 return true;
             }
 
@@ -166,13 +141,13 @@ namespace BudgetTracker.Data
 
         public bool RemoveUser(int userId)
         {
-            LoadData(); // Fix this issue - We need to have one instance of DataStore used through out the application
             var userToRemove = _applicationData.Users.FirstOrDefault(e => e.Id == userId);
 
             if (userToRemove != null)
             {
                 _applicationData.Users.Remove(userToRemove);
                 UpdateData();
+
                 return true;
             }
 
@@ -199,6 +174,77 @@ namespace BudgetTracker.Data
             {
                 _applicationData.Budgets.Remove(budgetToRemove);
                 UpdateData();
+            }
+        }
+
+        public void UpdateCategoryName(int categoryId, string name)
+        {
+            var category = _applicationData.Categories.First(e => e.Id == categoryId);
+            category.Name = name;
+            UpdateData();
+        }
+
+        public void UpdateNameOfUser(int userId, string name)
+        {
+            var user = _applicationData.Users.First(u => u.Id == userId);
+            user.Name = name;
+            UpdateData();
+        }
+
+        public int GenerateNextBudgetId()
+        {
+            return _applicationData.Budgets.Any()
+               ? _applicationData.Budgets.Max(b => b.Id) + 1
+               : 1;
+        }
+
+        public int GenerateNextCategoryId()
+        {
+            return _applicationData.Categories.Any()
+               ? _applicationData.Categories.Max(c => c.Id) + 1
+               : 1;
+        }
+
+        public int GenerateNextExpenseId()
+        {
+            return _applicationData.Expenses.Any()
+               ? _applicationData.Expenses.Max(e => e.Id) + 1
+               : 1;
+        }
+
+        public int GenerateNextUserId()
+        {
+            return _applicationData.Users.Any()
+               ? _applicationData.Users.Max(u => u.Id) + 1
+               : 1;
+        }
+
+        private void UpdateData()
+        {
+            var jsonData = JsonConvert.SerializeObject(_applicationData);
+            File.WriteAllText(_filePath, jsonData);
+        }
+
+        private void LoadData()
+        {
+            if (File.Exists(_filePath))
+            {
+                var jsonData = File.ReadAllText(_filePath);
+                var appData = JsonConvert.DeserializeObject<ApplicationData>(jsonData);
+
+                if (appData != null)
+                {
+                    _applicationData = appData;
+
+                    foreach (var expense in appData.Expenses)
+                    {
+                        expense.Category = appData.Categories.First(c => c.Id == expense.CategoryId);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Data file not found.");
             }
         }
     }

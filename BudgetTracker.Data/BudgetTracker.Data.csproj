@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BudgetTracker.Models\BudgetTracker.Models.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BudgetTracker.Models\BudgetTracker.Models.csproj" />
+  </ItemGroup>
+	
 </Project>

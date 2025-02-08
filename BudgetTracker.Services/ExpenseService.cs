@@ -1,16 +1,17 @@
 ﻿using System.Globalization;
-using BudgetTracker.Data;
+using BudgetTracker.Data.Interfaces;
 using BudgetTracker.Models;
+using BudgetTracker.Services.Interfaces;
 
 namespace BudgetTracker.Services
 {
-    public class ExpenseService
+    public class ExpenseService : IExpenseService
     {
-        private readonly DataStore _dataStore;
+        private readonly IDataStore _dataStore;
 
-        public ExpenseService()
+        public ExpenseService(IDataStore dataStore)
         {
-            _dataStore = new DataStore();
+            _dataStore = dataStore;
         }
 
         public Response<Expense> AddExpense(int budgetId, int categoryId, string description, DateTime date, decimal amount)
@@ -44,17 +45,11 @@ namespace BudgetTracker.Services
                 };
             }
 
-            var expenses = _dataStore.GetExpenses();
-
-            var newId = expenses.Any()
-                ? expenses.Max(e => e.Id) + 1
-                : 1;
-
             var category = _dataStore.GetCategoryById(categoryId);
 
             var newExpense = new Expense
             {
-                Id = newId,
+                Id = _dataStore.GenerateNextExpenseId(),
                 BudgetId = budgetId,
                 CategoryId = categoryId,
                 Category = category,
@@ -64,7 +59,6 @@ namespace BudgetTracker.Services
             };
 
             _dataStore.AddExpense(newExpense);
-            _dataStore.UpdateData();
 
             return new Response<Expense>
             {

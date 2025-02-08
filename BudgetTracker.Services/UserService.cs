@@ -1,23 +1,24 @@
-﻿using BudgetTracker.Data;
+﻿using BudgetTracker.Data.Interfaces;
 using BudgetTracker.Models;
+using BudgetTracker.Services.Interfaces;
 
 namespace BudgetTracker.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        public User ActiveUser { get; set; }
+        private User activeUser { get; set; }
 
-        private readonly DataStore _dataStore;
+        private readonly IDataStore _dataStore;
 
-        public UserService()
+        public UserService(IDataStore dataStore)
         {
-            ActiveUser = new User() { Name = string.Empty, Username = string.Empty};
-            _dataStore = new DataStore();
+            activeUser = new User() { Name = string.Empty, Username = string.Empty};
+            _dataStore = dataStore;
         }
 
-        public IEnumerable<User> GetUsers()
+        public bool ActiveUserExists()
         {
-            return _dataStore.GetUsers();
+            return activeUser != null && activeUser.Exists();
         }
 
         public Response<User> CreateUser(string? username, string? name)
@@ -48,22 +49,15 @@ namespace BudgetTracker.Services
                     Message = $"A user with the username '{username}' already exists.",
                 };
             }
-            
-            var appUsers = GetUsers();
-
-            var newId = appUsers.Any()
-                ? appUsers.Max(u => u.Id) + 1
-                : 1;
 
             var newUser = new User
             {
-                Id = newId,
+                Id = _dataStore.GenerateNextUserId(),
                 Username = username,
                 Name = name
             };
 
             _dataStore.AddUser(newUser);
-            _dataStore.UpdateData();
 
             return new Response<User>
             {
@@ -71,6 +65,48 @@ namespace BudgetTracker.Services
                 Message = $"User '{username}' has been successfully created.",
                 Data = newUser
             };
+        }
+
+        public int GetActiveUserId()
+        {
+            return activeUser.Id;
+        }
+
+        public string GetActiveUserName()
+        {
+            return activeUser.Name;
+        }
+        
+        public IEnumerable<User> GetUsers()
+        {
+            return _dataStore.GetUsers();
+        }
+
+        public IList<string> GetUsersAsTable()
+        {
+            var userDescriptions = new List<string>();
+
+            foreach (var user in GetUsers())
+            {
+                userDescriptions.Add(user.ToString());
+            }
+
+            return userDescriptions;
+        }
+        
+        public bool RemoveUser()
+        {
+            return _dataStore.RemoveUser(activeUser.Id);
+        }
+
+        public void SetActiveUserById(int selectedUserId)
+        {
+            activeUser = _dataStore.GetUserById(selectedUserId)!;
+        }
+
+        public void SetActiveUser(User user)
+        {
+            activeUser = user;
         }
 
         public Response<User> UpdateUser(string name)
@@ -84,12 +120,11 @@ namespace BudgetTracker.Services
                 };
             }
 
-            var user = _dataStore.GetUserById(ActiveUser.Id);
+            var user = _dataStore.GetUserById(activeUser.Id);
 
             if (user != null)
             {
-                user.Name = name;
-                _dataStore.UpdateData();
+                _dataStore.UpdateNameOfUser(user.Id, name);
 
                 return new Response<User>
                 {
@@ -106,31 +141,9 @@ namespace BudgetTracker.Services
             };
         }
 
-        public void SetActiveUserById(int selectedUserId)
-        {
-            ActiveUser = _dataStore.GetUserById(selectedUserId)!;
-        }
-
-        public IList<string> GetUsersAsTable()
-        {
-            var userDescriptions = new List<string>();
-
-            foreach (var user in GetUsers())
-            {
-                userDescriptions.Add(user.ToString());
-            }
-
-            return userDescriptions;
-        }
-
         private bool IsUsernameValid(string username)
         {
             return !_dataStore.UserExists(username);
-        }
-
-        public bool RemoveUser()
-        {
-            return _dataStore.RemoveUser(ActiveUser.Id);
         }
     }
 }

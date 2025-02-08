@@ -1,19 +1,19 @@
-﻿using BudgetTracker.Data;
+﻿using BudgetTracker.Data.Interfaces;
 using BudgetTracker.Models;
+using BudgetTracker.Services.Interfaces;
 
 namespace BudgetTracker.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
-        public Category SelectedCategory { get; set; }
+        private Category selectedCategory { get; set; }
 
-        private readonly DataStore _dataStore;
+        private readonly IDataStore _dataStore;
 
-        public CategoryService()
+        public CategoryService(IDataStore dataStore)
         {
-            SelectedCategory = new Category() { Name = string.Empty };
-
-            _dataStore = new DataStore();
+            selectedCategory = new Category() { Name = string.Empty };
+            _dataStore = dataStore;
         }
 
         public Response<Category> CreateCategory(string name)
@@ -36,20 +36,13 @@ namespace BudgetTracker.Services
                 };
             }
 
-            var categories = _dataStore.GetCategories();
-
-            var newId = categories.Any()
-                ? categories.Max(b => b.Id) + 1
-                : 1;
-
             var newCategory = new Category
             {
-                Id = newId,
+                Id = _dataStore.GenerateNextCategoryId(),
                 Name = name
             };
 
             _dataStore.AddCategory(newCategory);
-            _dataStore.UpdateData();
 
             return new Response<Category>
             {
@@ -61,7 +54,7 @@ namespace BudgetTracker.Services
 
         public bool DeleteCategory()
         {
-            return _dataStore.RemoveCategory(SelectedCategory.Id);
+            return _dataStore.RemoveCategory(selectedCategory.Id);
         }
 
         public IList<string> GetCategoriesAsTable()
@@ -76,9 +69,19 @@ namespace BudgetTracker.Services
             return categories;
         }
 
+        public Category? GetCategoryById(int categoryId)
+        {
+            return _dataStore.GetCategoryById(categoryId);
+        }
+
+        public bool HasSelectedCategory()
+        {
+            return selectedCategory != null;
+        }
+
         public void SetSelectedCategoryById(int categoryId)
         {
-            SelectedCategory = _dataStore.GetCategoryById(categoryId)!;
+            selectedCategory = _dataStore.GetCategoryById(categoryId)!;
         }
 
         public Response<Category> UpdateCategory(string name)
@@ -92,7 +95,7 @@ namespace BudgetTracker.Services
                 };
             }
 
-            var category = _dataStore.GetCategoryById(SelectedCategory.Id);
+            var category = _dataStore.GetCategoryById(selectedCategory.Id);
            
             if (!IsCategoryValid(name) && !name.Equals(category?.Name ?? string.Empty, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -106,8 +109,7 @@ namespace BudgetTracker.Services
 
             if (category != null)
             {
-                category.Name = name;
-                _dataStore.UpdateData();
+                _dataStore.UpdateCategoryName(category.Id, name);
 
                 return new Response<Category>
                 {
@@ -127,11 +129,6 @@ namespace BudgetTracker.Services
         private bool IsCategoryValid(string name)
         {
             return !_dataStore.CategoryExists(name);
-        }
-
-        public Category? GetCategoryById(int categoryId)
-        {
-            return _dataStore.GetCategoryById(categoryId);
         }
     }
 }

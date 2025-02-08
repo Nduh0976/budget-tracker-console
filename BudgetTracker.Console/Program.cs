@@ -1,14 +1,25 @@
 ﻿using System.Globalization;
 using BudgetTracker.Console;
 using BudgetTracker.Console.Constants;
+using BudgetTracker.Data.Extensions;
 using BudgetTracker.Models;
-using BudgetTracker.Services;
+using BudgetTracker.Services.Extensions;
+using BudgetTracker.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+
+var serviceCollection = new ServiceCollection();
+
+serviceCollection.AddDataStore();
+serviceCollection.AddServices();
+
+var serviceProvider = serviceCollection.BuildServiceProvider();
 
 var appRunning = true;
-var userService = new UserService();
-var budgetService = new BudgetService();
-var expenseService = new ExpenseService();
-var categoryService = new CategoryService();
+
+var userService = serviceProvider.GetRequiredService<IUserService>();
+var budgetService = serviceProvider.GetRequiredService<IBudgetService>();
+var expenseService = serviceProvider.GetRequiredService<IExpenseService>();
+var categoryService = serviceProvider.GetRequiredService<ICategoryService>();
 
 ConfigureConsole();
 
@@ -153,12 +164,12 @@ void CreateUser()
 
     if (response.Success)
     {
-        userService.ActiveUser = response.Data ?? new User() { Name = string.Empty, Username = string.Empty };
+        userService.SetActiveUser(response.Data ?? new User() { Name = string.Empty, Username = string.Empty });
     }
 
     Console.WriteLine(response.Message);
 
-    if (userService.ActiveUser != null && userService.ActiveUser.Exists())
+    if (userService.ActiveUserExists())
     {
         ConfigureConsole();
     }
@@ -175,7 +186,7 @@ void ViewUserSelection()
     var selectedUserId = int.Parse(DisplayMenuAndGetSelection(usersTable)[0].ToString());
     userService.SetActiveUserById(selectedUserId);
 
-    if (userService.ActiveUser.Exists())
+    if (userService.ActiveUserExists())
     {
         ConfigureConsole();
     }
@@ -188,7 +199,7 @@ void CreateBudget()
     var endDate = DateTime.ParseExact(GetUserInput("Enter end date(dd-mm-yyyy):"), "dd-MM-yyyy", CultureInfo.InvariantCulture);
     var amount = decimal.Parse(GetUserInput("Enter amount:"));
 
-    var response = budgetService.CreateBudget(userService.ActiveUser.Id, name, startDate, endDate, amount);
+    var response = budgetService.CreateBudget(userService.GetActiveUserId(), name, startDate, endDate, amount);
 
     Console.WriteLine(response.Message);
 }
@@ -209,7 +220,7 @@ void AddExpense()
     var categoryId = GetExpenseCategory();
     var amount = decimal.Parse(GetUserInput("Enter amount:"));
 
-    var response = expenseService.AddExpense(budgetService.SelectedBudget.Id, categoryId, description, date, amount);
+    var response = expenseService.AddExpense(budgetService.GetSelectedBudgetId(), categoryId, description, date, amount);
 
     Console.WriteLine(response.Message);
 }
@@ -236,7 +247,7 @@ void ViewCategorySelection()
 
     categoryService.SetSelectedCategoryById(selectedCategoryId);
 
-    if (categoryService.SelectedCategory != null)
+    if (categoryService.HasSelectedCategory())
     {
         var selectedBudgetMenu = DisplayMenuAndGetSelection(MenuItems.SelectedCategoryMenuItems);
 
@@ -260,12 +271,12 @@ void ViewBudgetSelection()
     Console.WriteLine($"    {"ID",-5} | {"Name",-30} | {"Start Date",-12} | {"End Date",-12} | {"Amount",-10}");
     Console.WriteLine(new string('-', 85));
 
-    var budgetsTable = budgetService.GetBudgetsAsTableByUserId(userService.ActiveUser.Id);
+    var budgetsTable = budgetService.GetBudgetsAsTableByUserId(userService.GetActiveUserId());
 
     var selectedBudgetId = int.Parse(DisplayMenuAndGetSelection(budgetsTable)[0].ToString());
     budgetService.SetSelectedBudgetById(selectedBudgetId);
 
-    if (budgetService.SelectedBudget.Exists())
+    if (budgetService.SelectedBudgetExists())
     {
         var selectedBudgetMenu = DisplayMenuAndGetSelection(MenuItems.SelectedBudgetMenuItems);
 
@@ -276,7 +287,7 @@ void ViewBudgetSelection()
                 break;
 
             case MenuItems.ViewExpenses:
-                var expenses = expenseService.GetExpensesByBudgetId(budgetService.SelectedBudget.Id);
+                var expenses = expenseService.GetExpensesByBudgetId(budgetService.GetSelectedBudgetId());
 
                 // Apply sorting and filtering
                 var sortedExpenses = GetSortedExpenses(expenses);
@@ -300,11 +311,11 @@ void ViewBudgetTotals()
 
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine(new string('=', 90));
-    Console.WriteLine($" Budget Details - {budgetService.SelectedBudget.Name} ");
+    Console.WriteLine($" Budget Details - {budgetService.GetSelectedBudgetName()} ");
     Console.WriteLine(new string('=', 90));
     Console.ResetColor();
 
-    Console.WriteLine($"Total Amount: {budgetService.SelectedBudget.Amount}");
+    Console.WriteLine($"Total Amount: {budgetService.GetSelectedBudgetAmount()}");
     Console.WriteLine($"Amount Used:  {amountUsed}");
     Console.WriteLine($"Remaining Balance: {remainingBalance}\n");
 }
@@ -445,10 +456,10 @@ IList<string> GetExpensesAsTable(IEnumerable<Expense> expenses)
 
 void ViewBudgetSummary()
 {
-    var budgetName = budgetService.SelectedBudget.Name;
-    var startDate = budgetService.SelectedBudget.StartDate.ToString("dd-MM-yyyy");
-    var endDate = budgetService.SelectedBudget.EndDate.ToString("dd-MM-yyyy");
-    var totalAmount = budgetService.SelectedBudget.Amount;
+    var budgetName = budgetService.GetSelectedBudgetName();
+    var startDate = budgetService.GetSelectedBudgetStartDate().ToString("dd-MM-yyyy");
+    var endDate = budgetService.GetSelectedBudgetEndDate().ToString("dd-MM-yyyy");
+    var totalAmount = budgetService.GetSelectedBudgetAmount();
     var amountUsed = budgetService.GetSelectedBudgetTotalSpent();
     var remainingBalance = budgetService.GetSelectedBudgetRemainingBalance();
 
@@ -483,7 +494,7 @@ void DisplayTotalExpensesByCategories()
 
     // Fetch and group expenses by category
     var expensesByCategory = expenseService
-        .GetExpensesByBudgetId(budgetService.SelectedBudget.Id)
+        .GetExpensesByBudgetId(budgetService.GetSelectedBudgetId())
         .GroupBy(e => e.CategoryId)
         .Select(group => new
         {
@@ -567,9 +578,9 @@ void DeleteExpense(int expenseId)
 
 void DeleteUser()
 {
-    var selectedUser = userService.ActiveUser;
+    var selectedUserId = userService.GetActiveUserId();
 
-    if (!selectedUser.Exists())
+    if (selectedUserId <= 0)
     {
         Console.WriteLine("No user selected.");
         return;
@@ -580,7 +591,7 @@ void DeleteUser()
 
     if (confirmation == "Y")
     {
-        budgetService.DeleteBudgetByUserId(selectedUser.Id);
+        budgetService.DeleteBudgetByUserId(selectedUserId);
         var result = userService.RemoveUser();
 
         if (result)
@@ -614,7 +625,7 @@ void UpdateUser()
     var response = userService.UpdateUser(name ?? string.Empty);
     if (response.Success)
     {
-        userService.ActiveUser = response.Data ?? new User() { Name = string.Empty, Username = string.Empty };
+        userService.SetActiveUser(response.Data ?? new User() { Name = string.Empty, Username = string.Empty });
         ConfigureConsole();
     }
 
@@ -639,7 +650,7 @@ void ConfigureConsole()
 {
     Console.Clear();
     Console.ForegroundColor = ConsoleColor.Blue;
-    Console.WriteLine(MenuHelper.GetWelcomeMessage(userService?.ActiveUser));
+    Console.WriteLine(MenuHelper.GetWelcomeMessage(userService.GetActiveUserName()));
     Console.ResetColor();
     Console.WriteLine($"\nUse ⬆ and ⬇ to navigate and key {ForeColorConfig.GreenForeColor}Enter/Return{ForeColorConfig.ForeColorReset} to select.");
     Console.CursorVisible = false;
