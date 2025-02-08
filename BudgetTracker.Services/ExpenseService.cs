@@ -91,6 +91,11 @@ namespace BudgetTracker.Services
             return expenseDescriptions;
         }
 
+        public IEnumerable<Expense> GetExpensesByBudgetId(int budgetId)
+        {
+            return _dataStore.GetExpensesByBudgetId(budgetId);
+        }
+
         public Response<Expense> UpdateExpense(int expenseId, int categoryId, string description, string date, string amount)
         {
             var expense = _dataStore.GetExpenseById(expenseId)!;
