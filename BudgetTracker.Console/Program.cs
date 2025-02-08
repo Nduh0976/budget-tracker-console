@@ -267,8 +267,14 @@ void ViewBudgetSelection()
                 break;
 
             case MenuItems.ViewExpenses:
+                var expenses = expenseService.GetExpensesByBudgetId(budgetService.SelectedBudget.Id);
+
+                // Apply sorting and filtering
+                var sortedExpenses = GetSortedExpenses(expenses);
+                var filteredExpenses = GetFilteredExpenses(sortedExpenses);
+
                 ViewBudgetTotals();
-                ViewExpenseSelection();
+                ViewExpenseSelection(filteredExpenses);
                 break;
 
             case MenuItems.ViewBudgetSummary:
@@ -294,16 +300,14 @@ void ViewBudgetTotals()
     Console.WriteLine($"Remaining Balance: {remainingBalance}\n");
 }
 
-void ViewExpenseSelection()
+void ViewExpenseSelection(IEnumerable<Expense> expenses)
 {
     // Print table header
     Console.WriteLine(new string('=', 90));
     Console.WriteLine($"    {"ID",-5} | {"Description",-30} | {"Category",-20} | {"Date",-12} | {"Amount",-10}");
     Console.WriteLine(new string('-', 90));
 
-    var expensesTable = expenseService.GetExpensesAsTableByBudgetId(budgetService.SelectedBudget.Id);
-
-    
+    var expensesTable = GetExpensesAsTable(expenses);
     var selectedExpenseId = int.Parse(DisplayMenuAndGetSelection(expensesTable)[0].ToString());
 
     if (selectedActiveMenuOption != null)
@@ -321,6 +325,114 @@ void ViewExpenseSelection()
                 break;
         }
     }
+}
+
+IEnumerable<Expense> GetSortedExpenses(IEnumerable<Expense> expenses)
+{
+    // Prompt user for sorting option
+    var sortOption = GetSortOption();
+    switch (sortOption)
+    {
+        case SortItems.Date:
+            expenses = expenses.OrderBy(e => e.Date);
+            break;
+        case SortItems.Amount:
+            expenses = expenses.OrderByDescending(e => e.Amount);
+            break;
+        case SortItems.Category:
+            expenses = expenses.OrderBy(e => categoryService.GetCategoryById(e.CategoryId)?.Name ?? "Unknown");
+            break;
+        default:
+            break;
+    }
+
+    return expenses;
+}
+
+string GetSortOption()
+{
+    Console.WriteLine("\nSelect sorting option:");
+    Console.WriteLine("1. Sort by Date");
+    Console.WriteLine("2. Sort by Amount");
+    Console.WriteLine("3. Sort by Category");
+    Console.WriteLine("4. No sorting");
+
+    var input = GetUserInput("Enter your choice (1-4): ");
+
+    return input switch
+    {
+        "1" => SortItems.Date,
+        "2" => SortItems.Amount,
+        "3" => SortItems.Category,
+        _ => SortItems.NoSorting,
+    };
+}
+
+IEnumerable<Expense> GetFilteredExpenses(IEnumerable<Expense> expenses)
+{
+    var filterOption = GetFilterOption();
+
+    switch (filterOption)
+    {
+        case FilterItems.DateRange:
+            return FilterByDateRange(expenses);
+        case FilterItems.Category:
+            return FilterByCategory(expenses);
+        default:
+            return expenses;
+    }
+}
+
+string GetFilterOption()
+{
+    Console.WriteLine("\nDo you want to filter expenses? (Y/N): ");
+    var filterChoice = GetUserInput("").Trim().ToUpper();
+
+    if (filterChoice != "Y") return FilterItems.NoFilter;
+
+    Console.WriteLine("Select filter criteria:");
+    Console.WriteLine("1. Filter by Date Range");
+    Console.WriteLine("2. Filter by Category");
+    Console.WriteLine("3. No filtering");
+
+    var filterOption = GetUserInput("Enter your choice (1-3): ");
+
+    return filterOption switch
+    {
+        "1" => FilterItems.DateRange,
+        "2" => FilterItems.Category,
+        _ => FilterItems.NoFilter,
+    };
+}
+
+IEnumerable<Expense> FilterByDateRange(IEnumerable<Expense> expenses)
+{
+    var startDate = DateTime.ParseExact(GetUserInput("Enter start date (dd-mm-yyyy): "), "dd-MM-yyyy", CultureInfo.InvariantCulture);
+    var endDate = DateTime.ParseExact(GetUserInput("Enter end date (dd-mm-yyyy): "), "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
+    return expenses.Where(e => e.Date >= startDate && e.Date <= endDate);
+}
+
+IEnumerable<Expense> FilterByCategory(IEnumerable<Expense> expenses)
+{
+    Console.WriteLine("Select Category:");
+    var categoriesTable = categoryService.GetCategoriesAsTable();
+    Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
+    var selectedCategoryId = int.Parse(DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+
+    return expenses.Where(e => e.CategoryId == selectedCategoryId);
+}
+
+IList<string> GetExpensesAsTable(IEnumerable<Expense> expenses)
+{
+    var expenseDescriptions = new List<string>();
+
+    foreach (var expense in expenses)
+    {
+        expenseDescriptions.Add(expense.ToString());
+    }
+
+    return expenseDescriptions;
 }
 
 void ViewBudgetSummary()

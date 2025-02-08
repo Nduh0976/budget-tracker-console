@@ -79,18 +79,6 @@ namespace BudgetTracker.Services
             return _dataStore.RemoveExpense(expenseId);
         }
 
-        public IList<string> GetExpensesAsTableByBudgetId(int budgetId)
-        {
-            var expenseDescriptions = new List<string>();
-
-            foreach (var expense in _dataStore.GetExpensesByBudgetId(budgetId))
-            {
-                expenseDescriptions.Add(expense.ToString());
-            }
-
-            return expenseDescriptions;
-        }
-
         public IEnumerable<Expense> GetExpensesByBudgetId(int budgetId)
         {
             return _dataStore.GetExpensesByBudgetId(budgetId);

@@ -8,7 +8,6 @@
         public const string DeleteExpense = "Delete Expense";
         public const string SetMonthlyBudget = "Set Monthly Budget";
         public const string ViewBudgetSummary = "View Budget Summary";
-        public const string AddFilterAndSortExpenses = "Add, Filter and Sort Expenses";
         public const string ManageCategories = "Manage Categories";
         public const string SwitchUser = "Switch User";
         public const string EditUser = "Edit User";
@@ -30,7 +29,6 @@
         public static readonly IList<string> ActiveMenuItems =
         [
             Budgets,
-            AddFilterAndSortExpenses,
             ManageCategories,
             SwitchUser,
             EditUser,
