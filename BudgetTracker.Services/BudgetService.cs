@@ -99,5 +99,16 @@ namespace BudgetTracker.Services
         {
             return SelectedBudget.Amount - GetSelectedBudgetTotalSpent();
         }
+
+        public void DeleteBudgetByUserId(int userId)
+        {
+            var budgets = _dataStore.GetBudgetsByUserId(userId).ToList();
+
+            foreach (var budgetId in budgets.Select(b => b.Id))
+            {
+                _dataStore.RemoveExpensesByBudgetId(budgetId);
+                _dataStore.RemoveBudget(budgetId);
+            }
+        }
     }
 }

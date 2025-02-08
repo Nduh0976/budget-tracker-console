@@ -127,5 +127,10 @@ namespace BudgetTracker.Services
         {
             return !_dataStore.UserExists(username);
         }
+
+        public bool RemoveUser()
+        {
+            return _dataStore.RemoveUser(ActiveUser.Id);
+        }
     }
 }

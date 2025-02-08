@@ -163,5 +163,43 @@ namespace BudgetTracker.Data
 
             return false;
         }
+
+        public bool RemoveUser(int userId)
+        {
+            LoadData(); // Fix this issue - We need to have one instance of DataStore used through out the application
+            var userToRemove = _applicationData.Users.FirstOrDefault(e => e.Id == userId);
+
+            if (userToRemove != null)
+            {
+                _applicationData.Users.Remove(userToRemove);
+                UpdateData();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void RemoveExpensesByBudgetId(int budgetId)
+        {
+            var expensesToRemove = _applicationData.Expenses.Where(e => e.BudgetId == budgetId).ToList();
+
+            foreach (var expenseId in expensesToRemove.Select(e => e.Id))
+            {
+                RemoveExpense(expenseId);
+            }
+
+            UpdateData();
+        }
+
+        public void RemoveBudget(int budgetId)
+        {
+            var budgetToRemove = _applicationData.Budgets.FirstOrDefault(e => e.Id == budgetId);
+
+            if (budgetToRemove != null)
+            {
+                _applicationData.Budgets.Remove(budgetToRemove);
+                UpdateData();
+            }
+        }
     }
 }
