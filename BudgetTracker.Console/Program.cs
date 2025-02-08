@@ -267,8 +267,18 @@ void ViewBudgetSelection()
                 break;
 
             case MenuItems.ViewExpenses:
+                var expenses = expenseService.GetExpensesByBudgetId(budgetService.SelectedBudget.Id);
+
+                // Apply sorting and filtering
+                var sortedExpenses = GetSortedExpenses(expenses);
+                var filteredExpenses = GetFilteredExpenses(sortedExpenses);
+
                 ViewBudgetTotals();
-                ViewExpenseSelection();
+                ViewExpenseSelection(filteredExpenses);
+                break;
+
+            case MenuItems.ViewBudgetSummary:
+                ViewBudgetSummary();
                 break;
         }
     }
@@ -290,16 +300,14 @@ void ViewBudgetTotals()
     Console.WriteLine($"Remaining Balance: {remainingBalance}\n");
 }
 
-void ViewExpenseSelection()
+void ViewExpenseSelection(IEnumerable<Expense> expenses)
 {
     // Print table header
     Console.WriteLine(new string('=', 90));
     Console.WriteLine($"    {"ID",-5} | {"Description",-30} | {"Category",-20} | {"Date",-12} | {"Amount",-10}");
     Console.WriteLine(new string('-', 90));
 
-    var expensesTable = expenseService.GetExpensesAsTableByBudgetId(budgetService.SelectedBudget.Id);
-
-    
+    var expensesTable = GetExpensesAsTable(expenses);
     var selectedExpenseId = int.Parse(DisplayMenuAndGetSelection(expensesTable)[0].ToString());
 
     if (selectedActiveMenuOption != null)
@@ -311,12 +319,193 @@ void ViewExpenseSelection()
             case MenuItems.EditExpense:
                 UpdateExpense(selectedExpenseId);
                 break;
+
             case MenuItems.DeleteExpense:
                 DeleteExpense(selectedExpenseId);
                 break;
-
         }
     }
+}
+
+IEnumerable<Expense> GetSortedExpenses(IEnumerable<Expense> expenses)
+{
+    var sortOption = GetSortOption();
+    switch (sortOption)
+    {
+        case SortItems.Date:
+            expenses = expenses.OrderBy(e => e.Date);
+            break;
+        case SortItems.Amount:
+            expenses = expenses.OrderByDescending(e => e.Amount);
+            break;
+        case SortItems.Category:
+            expenses = expenses.OrderBy(e => categoryService.GetCategoryById(e.CategoryId)?.Name ?? "Unknown");
+            break;
+        default:
+            break;
+    }
+
+    return expenses;
+}
+
+string GetSortOption()
+{
+    Console.WriteLine("\nSelect sorting option:");
+    Console.WriteLine("1. Sort by Date");
+    Console.WriteLine("2. Sort by Amount");
+    Console.WriteLine("3. Sort by Category");
+    Console.WriteLine("4. No sorting");
+
+    var input = GetUserInput("Enter your choice (1-4): ");
+
+    return input switch
+    {
+        "1" => SortItems.Date,
+        "2" => SortItems.Amount,
+        "3" => SortItems.Category,
+        _ => SortItems.NoSorting,
+    };
+}
+
+IEnumerable<Expense> GetFilteredExpenses(IEnumerable<Expense> expenses)
+{
+    var filterOption = GetFilterOption();
+
+    switch (filterOption)
+    {
+        case FilterItems.DateRange:
+            return FilterByDateRange(expenses);
+        case FilterItems.Category:
+            return FilterByCategory(expenses);
+        default:
+            return expenses;
+    }
+}
+
+string GetFilterOption()
+{
+    Console.WriteLine("\nDo you want to filter expenses? (Y/N): ");
+    var filterChoice = GetUserInput("").Trim().ToUpper();
+
+    if (filterChoice != "Y") return FilterItems.NoFilter;
+
+    Console.WriteLine("Select filter criteria:");
+    Console.WriteLine("1. Filter by Date Range");
+    Console.WriteLine("2. Filter by Category");
+    Console.WriteLine("3. No filtering");
+
+    var filterOption = GetUserInput("Enter your choice (1-3): ");
+
+    return filterOption switch
+    {
+        "1" => FilterItems.DateRange,
+        "2" => FilterItems.Category,
+        _ => FilterItems.NoFilter,
+    };
+}
+
+IEnumerable<Expense> FilterByDateRange(IEnumerable<Expense> expenses)
+{
+    var startDate = DateTime.ParseExact(GetUserInput("Enter start date (dd-mm-yyyy): "), "dd-MM-yyyy", CultureInfo.InvariantCulture);
+    var endDate = DateTime.ParseExact(GetUserInput("Enter end date (dd-mm-yyyy): "), "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
+    return expenses.Where(e => e.Date >= startDate && e.Date <= endDate);
+}
+
+IEnumerable<Expense> FilterByCategory(IEnumerable<Expense> expenses)
+{
+    Console.WriteLine("Select Category:");
+    var categoriesTable = categoryService.GetCategoriesAsTable();
+    Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
+    var selectedCategoryId = int.Parse(DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+
+    return expenses.Where(e => e.CategoryId == selectedCategoryId);
+}
+
+IList<string> GetExpensesAsTable(IEnumerable<Expense> expenses)
+{
+    var expenseDescriptions = new List<string>();
+
+    foreach (var expense in expenses)
+    {
+        expenseDescriptions.Add(expense.ToString());
+    }
+
+    return expenseDescriptions;
+}
+
+void ViewBudgetSummary()
+{
+    var budgetName = budgetService.SelectedBudget.Name;
+    var startDate = budgetService.SelectedBudget.StartDate.ToString("dd-MM-yyyy");
+    var endDate = budgetService.SelectedBudget.EndDate.ToString("dd-MM-yyyy");
+    var totalAmount = budgetService.SelectedBudget.Amount;
+    var amountUsed = budgetService.GetSelectedBudgetTotalSpent();
+    var remainingBalance = budgetService.GetSelectedBudgetRemainingBalance();
+
+    var percentageUsed = (totalAmount > 0) ? Math.Round((amountUsed / totalAmount) * 100, 2) : 0;
+    var percentageRemaining = 100 - percentageUsed;
+
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine(new string('=', 85));
+    Console.WriteLine($" Budget Summary - {budgetName} ");
+    Console.WriteLine(new string('=', 85));
+    Console.ResetColor();
+
+    // Print detailed budget information
+    Console.WriteLine($"\nStart Date: {startDate}");
+    Console.WriteLine($"End Date:   {endDate}");
+    Console.WriteLine($"Total Amount: {totalAmount:C}");
+    Console.WriteLine($"Amount Used:  {amountUsed:C} ({percentageUsed}% of total)");
+    Console.WriteLine($"Remaining Balance: {remainingBalance:C} ({percentageRemaining}% of total)\n");
+
+    Console.WriteLine(new string('-', 85));
+
+    DisplayProgressBar(percentageUsed);
+    DisplayTotalExpensesByCategories();
+}
+
+void DisplayTotalExpensesByCategories()
+{
+    Console.WriteLine("\nExpenses Breakdown by Category:");
+    Console.WriteLine(new string('-', 85));
+    Console.WriteLine($"{"Category",-30} | {"Total Expense",-15}");
+    Console.WriteLine(new string('-', 85));
+
+    // Fetch and group expenses by category
+    var expensesByCategory = expenseService
+        .GetExpensesByBudgetId(budgetService.SelectedBudget.Id)
+        .GroupBy(e => e.CategoryId)
+        .Select(group => new
+        {
+            CategoryId = group.Key,
+            TotalAmount = group.Sum(e => e.Amount),
+            CategoryName = categoryService.GetCategoryById(group.Key)?.Name ?? "Unknown"
+        })
+        .OrderByDescending(g => g.TotalAmount);
+
+    foreach (var category in expensesByCategory)
+    {
+        Console.WriteLine($"{category.CategoryName,-30} | {category.TotalAmount:C}");
+    }
+
+    Console.WriteLine(new string('-', 85));
+
+    Console.WriteLine("\nPress any key to return to the menu...");
+    Console.ReadKey();
+}
+
+void DisplayProgressBar(decimal percentage)
+{
+    const int progressBarWidth = 50;
+    int filledWidth = (int)(percentage / 100 * progressBarWidth);
+
+    Console.Write("Progress: [");
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.Write(new string('#', filledWidth)); // Filled portion
+    Console.ResetColor();
+    Console.Write(new string(' ', progressBarWidth - filledWidth)); // Empty portion
+    Console.WriteLine($"] {percentage}%");
 }
 
 void DeleteCategory()

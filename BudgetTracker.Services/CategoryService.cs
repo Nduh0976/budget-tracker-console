@@ -128,5 +128,10 @@ namespace BudgetTracker.Services
         {
             return !_dataStore.CategoryExists(name);
         }
+
+        public Category? GetCategoryById(int categoryId)
+        {
+            return _dataStore.GetCategoryById(categoryId);
+        }
     }
 }
