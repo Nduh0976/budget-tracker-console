@@ -15,7 +15,7 @@ namespace BudgetTracker.Services
             activeUser = new User() { Name = string.Empty, Username = string.Empty};
             _dataStore = dataStore;
         }
-        
+
         public bool ActiveUserExists()
         {
             return activeUser != null && activeUser.Exists();
