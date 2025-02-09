@@ -12,6 +12,8 @@ namespace BudgetTracker.Services.Extensions
             services.AddSingleton<IBudgetService, BudgetService>();
             services.AddSingleton<IExpenseService, ExpenseService>();
             services.AddSingleton<ICategoryService, CategoryService>();
+            services.AddSingleton<MenuService>();
+            services.AddSingleton<MenuDisplayService>();
         }
     }
 }
