@@ -1,4 +1,4 @@
-﻿namespace BudgetTracker.Console.Constants
+﻿namespace BudgetTracker.Services.Constants
 {
     public static class FilterItems
     {
