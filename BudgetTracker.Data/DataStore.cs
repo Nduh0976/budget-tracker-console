@@ -219,7 +219,7 @@ namespace BudgetTracker.Data
                : 1;
         }
 
-        private void UpdateData()
+        public void UpdateData()
         {
             var jsonData = JsonConvert.SerializeObject(_applicationData);
             File.WriteAllText(_filePath, jsonData);

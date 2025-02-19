@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
-using System.Text;
 using BudgetTracker.Models;
 using BudgetTracker.Services.Constants;
+using BudgetTracker.Services.Extensions;
 using BudgetTracker.Services.Interfaces;
 
 namespace BudgetTracker.Services
@@ -80,7 +80,7 @@ namespace BudgetTracker.Services
 
             var usersTable = _userService.GetUsersAsTable();
 
-            var selectedUserId = int.Parse(_menuDisplayService.DisplayMenuAndGetSelection(usersTable)[0].ToString());
+            var selectedUserId = _menuDisplayService.DisplayMenuAndGetSelection(usersTable).GetFirstNumber().GetValueOrDefault();
             _userService.SetActiveUserById(selectedUserId);
 
             if (_userService.ActiveUserExists())
@@ -226,7 +226,7 @@ namespace BudgetTracker.Services
 
             var budgetsTable = _budgetService.GetBudgetsAsTableByUserId(_userService.GetActiveUserId());
 
-            var selectedBudgetId = int.Parse(_menuDisplayService.DisplayMenuAndGetSelection(budgetsTable)[0].ToString());
+            var selectedBudgetId = _menuDisplayService.DisplayMenuAndGetSelection(budgetsTable).GetFirstNumber().GetValueOrDefault();
             _budgetService.SetSelectedBudgetById(selectedBudgetId);
 
             if (_budgetService.SelectedBudgetExists())
@@ -275,7 +275,7 @@ namespace BudgetTracker.Services
             var categoriesTable = _categoryService.GetCategoriesAsTable();
             Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
 
-            return int.Parse(_menuDisplayService.DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+            return _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable).GetFirstNumber().GetValueOrDefault();
         }
 
         private IEnumerable<Expense> GetSortedExpenses(IEnumerable<Expense> expenses)
@@ -328,7 +328,7 @@ namespace BudgetTracker.Services
             Console.WriteLine(MenuMessages.CategoryPrompt);
             var categoriesTable = _categoryService.GetCategoriesAsTable();
             Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
-            var selectedCategoryId = int.Parse(_menuDisplayService.DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+            var selectedCategoryId = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable).GetFirstNumber().GetValueOrDefault();
 
             return expenses.Where(e => e.CategoryId == selectedCategoryId);
         }
@@ -354,7 +354,7 @@ namespace BudgetTracker.Services
 
             var categoriesTable = _categoryService.GetCategoriesAsTable();
 
-            var selectedCategoryId = int.Parse(_menuDisplayService.DisplayMenuAndGetSelection(categoriesTable)[0].ToString());
+            var selectedCategoryId = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable).GetFirstNumber().GetValueOrDefault();
 
             _categoryService.SetSelectedCategoryById(selectedCategoryId);
 
@@ -425,7 +425,7 @@ namespace BudgetTracker.Services
             Console.WriteLine(new string('-', 90));
 
             var expensesTable = _menuDisplayService.GetExpensesAsTable(expenses);
-            var selectedExpenseId = int.Parse(_menuDisplayService.DisplayMenuAndGetSelection(expensesTable)[0].ToString());
+            var selectedExpenseId = _menuDisplayService.DisplayMenuAndGetSelection(expensesTable).GetFirstNumber().GetValueOrDefault();
 
             var selectedExpenseMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedExpenseMenuItems);
 

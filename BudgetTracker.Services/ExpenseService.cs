@@ -119,6 +119,8 @@ namespace BudgetTracker.Services
             expense.Date = newDate;
             expense.Amount = newAmount;
 
+            _dataStore.UpdateData();
+
             return new Response<Expense>
             {
                 Success = true,
