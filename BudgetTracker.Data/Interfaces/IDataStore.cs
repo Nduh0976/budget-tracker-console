@@ -57,5 +57,7 @@ namespace BudgetTracker.Data.Interfaces
         IEnumerable<User> GetUsers();
 
         User? GetUserById(int userId);
+
+        void UpdateData();
     }
 }
