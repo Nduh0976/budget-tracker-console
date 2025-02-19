@@ -253,6 +253,10 @@ namespace BudgetTracker.Services
                     case MenuItems.ViewBudgetSummary:
                         _menuDisplayService.ViewBudgetSummary();
                         break;
+
+                    case MenuItems.SetMonthlyBudget:
+                        UpdateBudgetAmount();
+                        break;
                 }
             }
         }
@@ -265,6 +269,16 @@ namespace BudgetTracker.Services
             var amount = decimal.Parse(_menuDisplayService.GetUserInput(MenuMessages.AmountPrompt));
 
             var response = _expenseService.AddExpense(_budgetService.GetSelectedBudgetId(), categoryId, description, date, amount);
+
+            Console.WriteLine(response.Message);
+        }
+
+        private void UpdateBudgetAmount()
+        {
+            Console.WriteLine(MenuMessages.SkipUpdate);
+
+            var amount = _menuDisplayService.GetUserInput(MenuMessages.AmountPrompt);
+            var response = _expenseService.UpdateBudgetAmount(_budgetService.GetSelectedBudgetId(), amount);
 
             Console.WriteLine(response.Message);
         }
