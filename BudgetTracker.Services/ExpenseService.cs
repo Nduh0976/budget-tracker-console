@@ -78,6 +78,35 @@ namespace BudgetTracker.Services
             return _dataStore.GetExpensesByBudgetId(budgetId);
         }
 
+        public Response<Budget> UpdateBudgetAmount(int budgetId, string amount)
+        {
+            var budget = _dataStore.GetBudgetById(budgetId)!;
+
+            var newAmount = string.IsNullOrEmpty(amount.Trim())
+                ? budget.Amount
+                : decimal.Parse(amount);
+
+            if (newAmount < 0)
+            {
+                return new Response<Budget>
+                {
+                    Success = false,
+                    Message = "Amount cannot be negative.",
+                };
+            }
+
+            budget.Amount = newAmount;
+
+            _dataStore.UpdateData();
+
+            return new Response<Budget>
+            {
+                Success = true,
+                Message = $"Budget amount for '{budget.Name}' has been successfully updated.",
+                Data = budget
+            };
+        }
+
         public Response<Expense> UpdateExpense(int expenseId, int categoryId, string description, string date, string amount)
         {
             var expense = _dataStore.GetExpenseById(expenseId)!;
