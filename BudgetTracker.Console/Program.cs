@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // Clear terminal
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {
-    Process.Start("cmd", "/c cls").WaitForExit();
+    await Process.Start("cmd", "/c cls").WaitForExitAsync();
 }
 else
 {
-    Process.Start("clear").WaitForExit();
+    await Process.Start("clear").WaitForExitAsync();
 }
 
 var serviceProvider = AppInitializer.InitializeServices();
