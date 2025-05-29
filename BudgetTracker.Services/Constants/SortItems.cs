@@ -6,5 +6,6 @@
         public const string Amount = "Amount";
         public const string Category = "Category";
         public const string NoSorting = "No Sorting";
+        public const string Back = "BACK";
     }
 }
