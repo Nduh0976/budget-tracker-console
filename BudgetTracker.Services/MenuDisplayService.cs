@@ -18,19 +18,28 @@ namespace BudgetTracker.Services
             IBudgetService budgetService,
             ICategoryService categoryService,
             IExpenseService expenseService)
-        { 
+        {
             _userService = userService;
             _budgetService = budgetService;
             _categoryService = categoryService;
             _expenseService = expenseService;
         }
 
-            public string DisplayMenuAndGetSelection(IList<string> menuItems, bool includeBackOption = false, bool includeExitOption = false)
+        public string DisplayMenuAndGetSelection(IList<string> menuItems, bool includeBackOption = false, bool includeExitOption = false, bool isDataList = false)
         {
             if (menuItems == null || menuItems.Count == 0)
             {
-                DisplayMessageAndWait(MenuMessages.NoMenuItems);
-                return string.Empty;
+                if (!includeBackOption && !includeExitOption)
+                {
+                    var message = isDataList
+                        ? MenuMessages.NoData
+                        : MenuMessages.NoMenuItems;
+                    DisplayMessageAndWait(message);
+                    return string.Empty;
+                }
+
+                // If we have navigation options, create a list with just those options
+                menuItems = [];
             }
 
             // Create a new list with navigation options
@@ -48,6 +57,11 @@ namespace BudgetTracker.Services
 
             // Clear and setup fresh display before showing menu
             SetupFreshDisplay();
+
+            if (isDataList && (menuItems == null || menuItems.Count == 0))
+            {
+                DisplayMessage($"{MenuMessages.NoData}\n");
+            }
 
             // Only show the navigation hint only if there are multiple items to scroll through
             if (extendedMenuItems.Count > 1)

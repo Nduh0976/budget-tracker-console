@@ -88,7 +88,7 @@ namespace BudgetTracker.Services
 
             var usersTable = _userService.GetUsersAsTable();
 
-            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(usersTable, includeBackOption: true);
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(usersTable, includeBackOption: true, isDataList: true);
 
             if (selectedResult == MenuItems.GoBack)
             {
@@ -269,7 +269,7 @@ namespace BudgetTracker.Services
 
             var budgetsTable = _budgetService.GetBudgetsAsTableByUserId(_userService.GetActiveUserId());
 
-            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(budgetsTable, includeBackOption: true);
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(budgetsTable, includeBackOption: true, isDataList: true);
 
             if (selectedResult == MenuItems.GoBack)
             {
@@ -384,7 +384,7 @@ namespace BudgetTracker.Services
             var categoriesTable = _categoryService.GetCategoriesAsTable();
             Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
 
-            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true);
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true, isDataList: true);
 
             if (selectedResult == MenuItems.GoBack)
             {
@@ -450,7 +450,7 @@ namespace BudgetTracker.Services
             var categoriesTable = _categoryService.GetCategoriesAsTable();
             Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
 
-            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true);
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true, isDataList: true);
 
             if (selectedResult == MenuItems.GoBack)
             {
@@ -500,7 +500,7 @@ namespace BudgetTracker.Services
 
             var categoriesTable = _categoryService.GetCategoriesAsTable();
 
-            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true);
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true, isDataList: true);
 
             if (selectedResult == MenuItems.GoBack)
             {
@@ -585,7 +585,7 @@ namespace BudgetTracker.Services
             Console.WriteLine(new string('-', 90));
 
             var expensesTable = _menuDisplayService.GetExpensesAsTable(expenses);
-            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(expensesTable, includeBackOption: true);
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(expensesTable, includeBackOption: true, isDataList: true);
 
             if (selectedResult == MenuItems.GoBack)
             {

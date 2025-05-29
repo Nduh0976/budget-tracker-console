@@ -4,6 +4,7 @@
     {
         public const string MenuNavigationHint = $"\nUse ⬆ and ⬇ to navigate and key {ForeColorConfig.GreenForeColor}Enter/Return{ForeColorConfig.ForeColorReset} to select.";
         public const string NoMenuItems = "No menu items available.";
+        public const string NoData = "No data available.";
         
         public const string DeletionCancelled = "Deletion canceled.";
 
