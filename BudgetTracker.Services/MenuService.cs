@@ -37,7 +37,12 @@ namespace BudgetTracker.Services
 
         private void ConfigureActiveUser()
         {
-            var selectedMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.UserMenuItems);
+            var selectedMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.UserMenuItems, includeExitOption: true);
+            if (selectedMenuOption == MenuItems.ExitApplication)
+            {
+                Console.WriteLine(MenuMessages.GoodBye);
+                Environment.Exit(0);
+            }
             ConfigureUser(selectedMenuOption);
         }
 
@@ -83,7 +88,15 @@ namespace BudgetTracker.Services
 
             var usersTable = _userService.GetUsersAsTable();
 
-            var selectedUserId = _menuDisplayService.DisplayMenuAndGetSelection(usersTable).GetFirstNumber().GetValueOrDefault();
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(usersTable, includeBackOption: true);
+
+            if (selectedResult == MenuItems.GoBack)
+            {
+                ConfigureActiveUser();
+                return;
+            }
+
+            var selectedUserId = selectedResult.GetFirstNumber().GetValueOrDefault();
             _userService.SetActiveUserById(selectedUserId);
 
             if (_userService.ActiveUserExists())
@@ -125,14 +138,12 @@ namespace BudgetTracker.Services
                         break;
 
                     case MenuItems.Budgets:
-                        var selectedBudgetMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.BudgetsMenuItems);
-                        HandleBudgetMenuSelection(selectedBudgetMenuOption);
+                        HandleBudgetMenu();
                         selectedActiveMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.ActiveMenuItems);
                         break;
 
                     case MenuItems.ManageCategories:
-                        var selectedCategoryMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.CategoriesMenuItems);
-                        HandleCategoryMenuSelection(selectedCategoryMenuOption);
+                        HandleCategoryMenu();
                         selectedActiveMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.ActiveMenuItems);
                         break;
 
@@ -140,6 +151,36 @@ namespace BudgetTracker.Services
                         appRunning = false;
                         break;
                 }
+            }
+        }
+
+        private void HandleBudgetMenu()
+        {
+            while (true)
+            {
+                var selectedBudgetMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.BudgetsMenuItems, includeBackOption: true);
+
+                if (selectedBudgetMenuOption == MenuItems.GoBack)
+                {
+                    break;
+                }
+
+                HandleBudgetMenuSelection(selectedBudgetMenuOption);
+            }
+        }
+
+        private void HandleCategoryMenu()
+        {
+            while (true)
+            {
+                var selectedCategoryMenuOption = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.CategoriesMenuItems, includeBackOption: true);
+
+                if (selectedCategoryMenuOption == MenuItems.GoBack)
+                {
+                    break;
+                }
+
+                HandleCategoryMenuSelection(selectedCategoryMenuOption);
             }
         }
 
@@ -228,12 +269,33 @@ namespace BudgetTracker.Services
 
             var budgetsTable = _budgetService.GetBudgetsAsTableByUserId(_userService.GetActiveUserId());
 
-            var selectedBudgetId = _menuDisplayService.DisplayMenuAndGetSelection(budgetsTable).GetFirstNumber().GetValueOrDefault();
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(budgetsTable, includeBackOption: true);
+
+            if (selectedResult == MenuItems.GoBack)
+            {
+                return;
+            }
+
+            var selectedBudgetId = selectedResult.GetFirstNumber().GetValueOrDefault();
             _budgetService.SetSelectedBudgetById(selectedBudgetId);
 
             if (_budgetService.SelectedBudgetExists())
             {
-                var selectedBudgetMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedBudgetMenuItems);
+                HandleSelectedBudget();
+            }
+        }
+
+        private void HandleSelectedBudget()
+        {
+            while (true)
+            {
+                var selectedBudgetMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedBudgetMenuItems, includeBackOption: true);
+
+                if (selectedBudgetMenu == MenuItems.GoBack)
+                {
+                    break;
+                }
+
                 HandleSelectedBudgetAction(selectedBudgetMenu);
             }
         }
@@ -264,12 +326,20 @@ namespace BudgetTracker.Services
         {
             var expenses = _expenseService.GetExpensesByBudgetId(_budgetService.GetSelectedBudgetId());
 
-            var sortedExpenses = GetSortedExpenses(expenses);
-            var filteredExpenses = GetFilteredExpenses(sortedExpenses);
+            while (true)
+            {
+                var sortedExpenses = GetSortedExpenses(expenses);
+                if (sortedExpenses == null) return; // User chose to go back
 
-            _menuDisplayService.SetupFreshDisplay();
-            _menuDisplayService.ViewBudgetTotals();
-            ViewExpenseSelection(filteredExpenses);
+                var filteredExpenses = GetFilteredExpenses(sortedExpenses);
+                if (filteredExpenses == null) return; // User chose to go back
+
+                _menuDisplayService.SetupFreshDisplay();
+                _menuDisplayService.ViewBudgetTotals();
+
+                var shouldContinue = ViewExpenseSelection(filteredExpenses);
+                if (!shouldContinue) break;
+            }
         }
 
         private void AddExpense()
@@ -284,6 +354,8 @@ namespace BudgetTracker.Services
             }
 
             var categoryId = GetExpenseCategory();
+            if (categoryId == -1) return; // User chose to go back
+
             var amountInput = _menuDisplayService.GetUserInput(MenuMessages.AmountPrompt);
 
             if (!decimal.TryParse(amountInput, out var amount))
@@ -312,12 +384,24 @@ namespace BudgetTracker.Services
             var categoriesTable = _categoryService.GetCategoriesAsTable();
             Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
 
-            return _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable).GetFirstNumber().GetValueOrDefault();
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true);
+
+            if (selectedResult == MenuItems.GoBack)
+            {
+                return -1; // Signal to go back
+            }
+
+            return selectedResult.GetFirstNumber().GetValueOrDefault();
         }
 
-        private IEnumerable<Expense> GetSortedExpenses(IEnumerable<Expense> expenses)
+        private IEnumerable<Expense>? GetSortedExpenses(IEnumerable<Expense> expenses)
         {
             var sortOption = _menuDisplayService.GetSortOption();
+
+            if (sortOption == SortItems.Back)
+            {
+                return null; // Signal to go back
+            }
 
             return sortOption switch
             {
@@ -328,9 +412,14 @@ namespace BudgetTracker.Services
             };
         }
 
-        private IEnumerable<Expense> GetFilteredExpenses(IEnumerable<Expense> expenses)
+        private IEnumerable<Expense>? GetFilteredExpenses(IEnumerable<Expense> expenses)
         {
             var filterOption = _menuDisplayService.GetFilterOption();
+
+            if (filterOption == FilterItems.Back)
+            {
+                return null; // Signal to go back
+            }
 
             return filterOption switch
             {
@@ -360,8 +449,15 @@ namespace BudgetTracker.Services
             Console.WriteLine(MenuMessages.CategoryPrompt);
             var categoriesTable = _categoryService.GetCategoriesAsTable();
             Console.WriteLine($"    {"ID",-5} | {"Name",-30}");
-            var selectedCategoryId = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable).GetFirstNumber().GetValueOrDefault();
 
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true);
+
+            if (selectedResult == MenuItems.GoBack)
+            {
+                return expenses; // Return all expenses if user goes back
+            }
+
+            var selectedCategoryId = selectedResult.GetFirstNumber().GetValueOrDefault();
             return expenses.Where(e => e.CategoryId == selectedCategoryId);
         }
 
@@ -404,12 +500,33 @@ namespace BudgetTracker.Services
 
             var categoriesTable = _categoryService.GetCategoriesAsTable();
 
-            var selectedCategoryId = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable).GetFirstNumber().GetValueOrDefault();
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(categoriesTable, includeBackOption: true);
+
+            if (selectedResult == MenuItems.GoBack)
+            {
+                return;
+            }
+
+            var selectedCategoryId = selectedResult.GetFirstNumber().GetValueOrDefault();
             _categoryService.SetSelectedCategoryById(selectedCategoryId);
 
             if (_categoryService.HasSelectedCategory())
             {
-                var selectedCategoryMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedCategoryMenuItems);
+                HandleSelectedCategory();
+            }
+        }
+
+        private void HandleSelectedCategory()
+        {
+            while (true)
+            {
+                var selectedCategoryMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedCategoryMenuItems, includeBackOption: true);
+
+                if (selectedCategoryMenu == MenuItems.GoBack)
+                {
+                    break;
+                }
+
                 HandleSelectedCategoryAction(selectedCategoryMenu);
             }
         }
@@ -461,17 +578,39 @@ namespace BudgetTracker.Services
             _menuDisplayService.DisplayMessageAndWait(response.Message);
         }
 
-        private void ViewExpenseSelection(IEnumerable<Expense> expenses)
+        private bool ViewExpenseSelection(IEnumerable<Expense> expenses)
         {
             Console.WriteLine(new string('=', 90));
             Console.WriteLine($"    {"ID",-5} | {"Description",-30} | {"Category",-20} | {"Date",-12} | {"Amount",-10}");
             Console.WriteLine(new string('-', 90));
 
             var expensesTable = _menuDisplayService.GetExpensesAsTable(expenses);
-            var selectedExpenseId = _menuDisplayService.DisplayMenuAndGetSelection(expensesTable).GetFirstNumber().GetValueOrDefault();
+            var selectedResult = _menuDisplayService.DisplayMenuAndGetSelection(expensesTable, includeBackOption: true);
 
-            var selectedExpenseMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedExpenseMenuItems);
-            HandleSelectedExpenseAction(selectedExpenseMenu, selectedExpenseId);
+            if (selectedResult == MenuItems.GoBack)
+            {
+                return false; // Signal to stop the loop in ViewExpensesWithSortingAndFiltering
+            }
+
+            var selectedExpenseId = selectedResult.GetFirstNumber().GetValueOrDefault();
+            HandleSelectedExpense(selectedExpenseId);
+
+            return true; // Continue the loop
+        }
+
+        private void HandleSelectedExpense(int selectedExpenseId)
+        {
+            while (true)
+            {
+                var selectedExpenseMenu = _menuDisplayService.DisplayMenuAndGetSelection(MenuItems.SelectedExpenseMenuItems, includeBackOption: true);
+
+                if (selectedExpenseMenu == MenuItems.GoBack)
+                {
+                    break;
+                }
+
+                HandleSelectedExpenseAction(selectedExpenseMenu, selectedExpenseId);
+            }
         }
 
         private void HandleSelectedExpenseAction(string selectedExpenseMenu, int expenseId)
@@ -493,6 +632,8 @@ namespace BudgetTracker.Services
             var description = _menuDisplayService.GetUserInput(MenuMessages.DescriptionPrompt);
             var date = _menuDisplayService.GetUserInput(MenuMessages.DatePrompt);
             var categoryId = GetExpenseCategory();
+            if (categoryId == -1) return; // User chose to go back
+
             var amount = _menuDisplayService.GetUserInput(MenuMessages.AmountPrompt);
 
             var response = _expenseService.UpdateExpense(expenseId, categoryId, description, date, amount);
@@ -507,7 +648,7 @@ namespace BudgetTracker.Services
             string resultMessage;
             if (confirmation == MenuMessages.Yes)
             {
-                resultMessage =_expenseService.DeleteExpense(expenseId)
+                resultMessage = _expenseService.DeleteExpense(expenseId)
                     ? MenuMessages.ExpenseRemoved
                     : MenuMessages.ProblemDeletingExpense;
             }

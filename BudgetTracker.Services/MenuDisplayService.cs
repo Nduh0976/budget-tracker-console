@@ -18,14 +18,14 @@ namespace BudgetTracker.Services
             IBudgetService budgetService,
             ICategoryService categoryService,
             IExpenseService expenseService)
-        {
+        { 
             _userService = userService;
             _budgetService = budgetService;
             _categoryService = categoryService;
             _expenseService = expenseService;
         }
 
-        public string DisplayMenuAndGetSelection(IList<string> menuItems)
+            public string DisplayMenuAndGetSelection(IList<string> menuItems, bool includeBackOption = false, bool includeExitOption = false)
         {
             if (menuItems == null || menuItems.Count == 0)
             {
@@ -33,11 +33,24 @@ namespace BudgetTracker.Services
                 return string.Empty;
             }
 
+            // Create a new list with navigation options
+            var extendedMenuItems = new List<string>(menuItems);
+
+            if (includeBackOption)
+            {
+                extendedMenuItems.Add(MenuItems.GoBack);
+            }
+
+            if (includeExitOption)
+            {
+                extendedMenuItems.Add(MenuItems.ExitApplication);
+            }
+
             // Clear and setup fresh display before showing menu
             SetupFreshDisplay();
 
             // Only show the navigation hint only if there are multiple items to scroll through
-            if (menuItems.Count > 1)
+            if (extendedMenuItems.Count > 1)
             {
                 DisplayMessage(MenuMessages.MenuNavigationHint);
             }
@@ -49,16 +62,16 @@ namespace BudgetTracker.Services
             while (!isSelected)
             {
                 Console.SetCursorPosition(Left, Top);
-                Console.WriteLine(GetMenu(selectedOption, menuItems));
+                Console.WriteLine(GetMenu(selectedOption, extendedMenuItems));
 
                 switch (Console.ReadKey(true).Key)
                 {
                     case ConsoleKey.DownArrow:
-                        selectedOption = (selectedOption + 1) % menuItems.Count;
+                        selectedOption = (selectedOption + 1) % extendedMenuItems.Count;
                         break;
 
                     case ConsoleKey.UpArrow:
-                        selectedOption = (selectedOption - 1 + menuItems.Count) % menuItems.Count;
+                        selectedOption = (selectedOption - 1 + extendedMenuItems.Count) % extendedMenuItems.Count;
                         break;
 
                     case ConsoleKey.Enter:
@@ -70,7 +83,7 @@ namespace BudgetTracker.Services
             // Show cursor for any subsequent input
             Console.CursorVisible = true;
 
-            var selectedUserMenuOption = menuItems[selectedOption];
+            var selectedUserMenuOption = extendedMenuItems[selectedOption];
             DisplayMessage($"{ForeColorConfig.GreenForeColor}You selected {selectedUserMenuOption}{ForeColorConfig.ForeColorReset}");
 
             return selectedUserMenuOption;
@@ -83,6 +96,7 @@ namespace BudgetTracker.Services
             DisplayMessage(MenuMessages.SortByAmount);
             DisplayMessage(MenuMessages.SortByCategory);
             DisplayMessage(MenuMessages.NoSorting);
+            DisplayMessage(MenuMessages.SortingBack);
 
             var input = GetUserInput(MenuMessages.InputSortingChoice);
 
@@ -91,6 +105,8 @@ namespace BudgetTracker.Services
                 "1" => SortItems.Date,
                 "2" => SortItems.Amount,
                 "3" => SortItems.Category,
+                "4" => SortItems.NoSorting,
+                "5" => SortItems.Back,
                 _ => SortItems.NoSorting,
             };
         }
@@ -98,7 +114,13 @@ namespace BudgetTracker.Services
         public string GetFilterOption()
         {
             DisplayMessage(MenuMessages.FilterOptionPrompt);
-            var filterChoice = GetUserInput("Enter your choice: ").Trim().ToUpper();
+            DisplayMessage(MenuMessages.FilteringBack);
+            var filterChoice = GetUserInput(MenuMessages.FilterOptionPromptOptions).Trim().ToUpper();
+
+            if (filterChoice == MenuMessages.Back)
+            {
+                return FilterItems.Back;
+            }
 
             if (filterChoice != MenuMessages.Yes)
             {
@@ -109,6 +131,7 @@ namespace BudgetTracker.Services
             DisplayMessage(MenuMessages.FilterByDateRange);
             DisplayMessage(MenuMessages.FilterByCategory);
             DisplayMessage(MenuMessages.NoFiltering);
+            DisplayMessage(MenuMessages.FilteringSecondaryBack);
 
             var filterOption = GetUserInput(MenuMessages.InputFilteringChoice);
 
@@ -116,6 +139,8 @@ namespace BudgetTracker.Services
             {
                 "1" => FilterItems.DateRange,
                 "2" => FilterItems.Category,
+                "3" => FilterItems.NoFilter,
+                "4" => FilterItems.Back,
                 _ => FilterItems.NoFilter,
             };
         }

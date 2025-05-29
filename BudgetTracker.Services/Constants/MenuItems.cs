@@ -13,6 +13,7 @@
         public const string EditUser = "Edit User";
         public const string DeleteUser = "Delete User";
         public const string ExitApplication = "Exit Application";
+        public const string GoBack = "← Go Back";
 
         public const string AddUser = "Add User";
         public const string SelectUser = "Select Existing User";

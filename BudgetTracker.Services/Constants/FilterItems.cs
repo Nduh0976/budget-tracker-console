@@ -5,5 +5,6 @@
         public const string DateRange = "Date Range";
         public const string Category = "Category";
         public const string NoFilter = "No Filter";
+        public const string Back = "BACK";
     }
 }
