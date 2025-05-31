@@ -7,7 +7,7 @@ namespace BudgetTracker.Services.Extensions
     {
         public static void AddServices(this IServiceCollection services)
         {
-            // Register services
+            services.AddSingleton<ILoggingService, LoggingService>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IBudgetService, BudgetService>();
             services.AddSingleton<IExpenseService, ExpenseService>();
