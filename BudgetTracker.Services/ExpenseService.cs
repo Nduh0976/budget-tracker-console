@@ -84,7 +84,7 @@ namespace BudgetTracker.Services
 
             var newAmount = string.IsNullOrEmpty(amount.Trim())
                 ? budget.Amount
-                : decimal.Parse(amount);
+                : decimal.Parse(amount, CultureInfo.InvariantCulture);
 
             if (newAmount < 0)
             {

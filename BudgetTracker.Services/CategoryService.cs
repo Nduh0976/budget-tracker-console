@@ -18,7 +18,7 @@ namespace BudgetTracker.Services
 
         public Response<Category> CreateCategory(string name)
         {
-            if (string.IsNullOrWhiteSpace(name.Trim()))
+            if (string.IsNullOrWhiteSpace(name?.Trim()))
             {
                 return new Response<Category>
                 {
