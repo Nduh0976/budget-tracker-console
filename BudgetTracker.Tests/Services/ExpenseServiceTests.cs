@@ -271,7 +271,7 @@ namespace BudgetTracker.Tests.Services
             var categoryId = 2;
             var description = "Updated Lunch";
             var date = "15-06-2024";
-            var amount = "30,00";
+            var amount = "30.00";
 
             var existingExpense = new Expense
             {
@@ -369,7 +369,7 @@ namespace BudgetTracker.Tests.Services
             var categoryId = 2;
             var description = "Updated Lunch";
             var date = "31-05-2024";
-            var amount = "30,00";
+            var amount = "30.00";
 
             var existingExpense = new Expense
             {
@@ -415,7 +415,7 @@ namespace BudgetTracker.Tests.Services
             var categoryId = 2;
             var description = "Updated Lunch";
             var date = "15-06-2024";
-            var amount = "-30,00";
+            var amount = "-30.00";
 
             var existingExpense = new Expense
             {
@@ -461,7 +461,7 @@ namespace BudgetTracker.Tests.Services
             var categoryId = 2;
             var description = "Updated Lunch";
             var date = "01-07-2024";
-            var amount = "30,00";
+            var amount = "30.00";
 
             var existingExpense = new Expense
             {
@@ -508,7 +508,7 @@ namespace BudgetTracker.Tests.Services
         {
             // Arrange
             var budgetId = 1;
-            var newAmount = "1500,00";
+            var newAmount = "1500.00";
 
             var budget = new Budget
             {
@@ -576,7 +576,7 @@ namespace BudgetTracker.Tests.Services
         {
             // Arrange
             var budgetId = 1;
-            var newAmount = "-500,00";
+            var newAmount = "-500.00";
 
             var budget = new Budget
             {
@@ -609,7 +609,7 @@ namespace BudgetTracker.Tests.Services
         {
             // Arrange
             var budgetId = 1;
-            var newAmount = "0,00";
+            var newAmount = "0.00";
 
             var budget = new Budget
             {
