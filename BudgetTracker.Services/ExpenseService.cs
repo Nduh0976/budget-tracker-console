@@ -121,7 +121,7 @@ namespace BudgetTracker.Services
 
             var newAmount = string.IsNullOrEmpty(amount.Trim())
                 ? expense.Amount
-                : decimal.Parse(amount);
+                : decimal.Parse(amount, CultureInfo.InvariantCulture);
 
             var budget = _dataStore.GetBudgetById(expense.BudgetId)!;
 
