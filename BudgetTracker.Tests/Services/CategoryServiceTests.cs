@@ -35,11 +35,15 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.CreateCategory(name);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"'{name}' Category has been successfully created."));
-            Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data.Id, Is.EqualTo(expectedId));
-            Assert.That(result.Data.Name, Is.EqualTo(name));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"'{name}' Category has been successfully created."));
+                Assert.That(result.Data, Is.Not.Null);
+                Assert.That(result.Data.Id, Is.EqualTo(expectedId));
+                Assert.That(result.Data.Name, Is.EqualTo(name));
+            });
+
 
             _mockDataStore.Verify(x => x.AddCategory(It.Is<Category>(c =>
                 c.Id == expectedId &&
@@ -56,9 +60,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.CreateCategory(invalidName);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddCategory(It.IsAny<Category>()), Times.Never);
         }
@@ -74,9 +81,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.CreateCategory(name);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo($"A category with the name '{name}' already exists."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo($"A category with the name '{name}' already exists."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddCategory(It.IsAny<Category>()), Times.Never);
         }
@@ -96,8 +106,11 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.CreateCategory(nameWithSpaces);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Data.Name, Is.EqualTo(nameWithSpaces));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Data.Name, Is.EqualTo(nameWithSpaces));
+            });
             _mockDataStore.Verify(x => x.CategoryExists(nameWithSpaces), Times.Once);
         }
 
@@ -151,8 +164,8 @@ namespace BudgetTracker.Tests.Services
             // Arrange
             var categories = new List<Category>
             {
-                new Category { Id = 1, Name = "Category 1" },
-                new Category { Id = 2, Name = "Category 2" }
+                new() { Id = 1, Name = "Category 1" },
+                new() { Id = 2, Name = "Category 2" }
             };
 
             _mockDataStore.Setup(x => x.GetCategories()).Returns(categories);
@@ -287,9 +300,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.UpdateCategory(newName);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"'{originalName}' Category has been successfully updated."));
-            Assert.That(result.Data, Is.EqualTo(category));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"'{originalName}' Category has been successfully updated."));
+                Assert.That(result.Data, Is.EqualTo(category));
+            });
 
             _mockDataStore.Verify(x => x.UpdateCategoryName(categoryId, newName), Times.Once);
         }
@@ -309,9 +325,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.UpdateCategory(invalidName);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateCategoryName(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
         }
@@ -348,9 +367,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.UpdateCategory(existingName);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo($"A category with the name '{existingName}' already exists."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo($"A category with the name '{existingName}' already exists."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateCategoryName(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
         }
@@ -372,9 +394,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.UpdateCategory(categoryName);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"'{categoryName}' Category has been successfully updated."));
-            Assert.That(result.Data, Is.EqualTo(category));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"'{categoryName}' Category has been successfully updated."));
+                Assert.That(result.Data, Is.EqualTo(category));
+            });
 
             _mockDataStore.Verify(x => x.UpdateCategoryName(categoryId, categoryName), Times.Once);
         }
@@ -397,9 +422,12 @@ namespace BudgetTracker.Tests.Services
             var result = _categoryService.UpdateCategory(sameNameDifferentCase);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"'{originalName}' Category has been successfully updated."));
-            Assert.That(result.Data, Is.EqualTo(category));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"'{originalName}' Category has been successfully updated."));
+                Assert.That(result.Data, Is.EqualTo(category));
+            });
 
             _mockDataStore.Verify(x => x.UpdateCategoryName(categoryId, sameNameDifferentCase), Times.Once);
         }

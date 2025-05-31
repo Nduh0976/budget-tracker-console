@@ -37,16 +37,19 @@ namespace BudgetTracker.Tests.Services
             // Act
             var result = _budgetService.CreateBudget(userId, name, startDate, endDate, amount);
 
+            Assert.Multiple(() =>
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"Budget '{name}' has been successfully created."));
-            Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data.Id, Is.EqualTo(expectedId));
-            Assert.That(result.Data.UserId, Is.EqualTo(userId));
-            Assert.That(result.Data.Name, Is.EqualTo(name));
-            Assert.That(result.Data.StartDate, Is.EqualTo(startDate));
-            Assert.That(result.Data.EndDate, Is.EqualTo(endDate));
-            Assert.That(result.Data.Amount, Is.EqualTo(amount));
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"Budget '{name}' has been successfully created."));
+                Assert.That(result.Data, Is.Not.Null);
+                Assert.That(result.Data.Id, Is.EqualTo(expectedId));
+                Assert.That(result.Data.UserId, Is.EqualTo(userId));
+                Assert.That(result.Data.Name, Is.EqualTo(name));
+                Assert.That(result.Data.StartDate, Is.EqualTo(startDate));
+                Assert.That(result.Data.EndDate, Is.EqualTo(endDate));
+                Assert.That(result.Data.Amount, Is.EqualTo(amount));
+            });
 
             _mockDataStore.Verify(x => x.AddBudget(It.Is<Budget>(b => b.Id == expectedId
                 && b.UserId == userId
@@ -72,9 +75,12 @@ namespace BudgetTracker.Tests.Services
             var result = _budgetService.CreateBudget(userId, invalidName, startDate, endDate, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddBudget(It.IsAny<Budget>()), Times.Never);
         }
@@ -93,9 +99,12 @@ namespace BudgetTracker.Tests.Services
             var result = _budgetService.CreateBudget(userId, name, startDate, endDate, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("End date cannot be earlier than start date."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("End date cannot be earlier than start date."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddBudget(It.IsAny<Budget>()), Times.Never);
         }
@@ -114,9 +123,12 @@ namespace BudgetTracker.Tests.Services
             var result = _budgetService.CreateBudget(userId, name, startDate, endDate, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddBudget(It.IsAny<Budget>()), Times.Never);
         }
@@ -139,8 +151,11 @@ namespace BudgetTracker.Tests.Services
             var result = _budgetService.CreateBudget(userId, name, startDate, endDate, amount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Data.Amount, Is.EqualTo(0m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Data.Amount, Is.EqualTo(0m));
+            });
         }
 
         #endregion
@@ -154,8 +169,8 @@ namespace BudgetTracker.Tests.Services
             var userId = 1;
             var budgets = new List<Budget>
             {
-                new Budget { Id = 1, UserId = userId, Name = "Budget 1", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m },
-                new Budget { Id = 2, UserId = userId, Name = "Budget 2", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 2000m }
+                new() { Id = 1, UserId = userId, Name = "Budget 1", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m },
+                new() { Id = 2, UserId = userId, Name = "Budget 2", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 2000m }
             };
 
             _mockDataStore.Setup(x => x.GetBudgetsByUserId(userId)).Returns(budgets);
@@ -198,8 +213,8 @@ namespace BudgetTracker.Tests.Services
             var userId = 1;
             var budgets = new List<Budget>
             {
-                new Budget { Id = 1, UserId = userId, Name = "Budget 1", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m },
-                new Budget { Id = 2, UserId = userId, Name = "Budget 2", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 2000m }
+                new() { Id = 1, UserId = userId, Name = "Budget 1", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m },
+                new() { Id = 2, UserId = userId, Name = "Budget 2", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 2000m }
             };
 
             _mockDataStore.Setup(x => x.GetBudgetsByUserId(userId)).Returns(budgets);
@@ -208,7 +223,7 @@ namespace BudgetTracker.Tests.Services
             var result = _budgetService.GetBudgetsAsTableByUserId(userId);
 
             // Assert
-            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result, Has.Count.EqualTo(2));
             Assert.That(result, Contains.Item(budgets[0].ToString()));
             Assert.That(result, Contains.Item(budgets[1].ToString()));
         }
@@ -218,7 +233,7 @@ namespace BudgetTracker.Tests.Services
         {
             // Arrange
             var userId = 1;
-            _mockDataStore.Setup(x => x.GetBudgetsByUserId(userId)).Returns(new List<Budget>());
+            _mockDataStore.Setup(x => x.GetBudgetsByUserId(userId)).Returns([]);
 
             // Act
             var result = _budgetService.GetBudgetsAsTableByUserId(userId);
@@ -268,11 +283,14 @@ namespace BudgetTracker.Tests.Services
             _budgetService.SetSelectedBudgetById(budgetId);
 
             // Assert
-            Assert.That(_budgetService.GetSelectedBudgetId(), Is.EqualTo(budgetId));
-            Assert.That(_budgetService.GetSelectedBudgetName(), Is.EqualTo(budget.Name));
-            Assert.That(_budgetService.GetSelectedBudgetAmount(), Is.EqualTo(budget.Amount));
-            Assert.That(_budgetService.GetSelectedBudgetStartDate(), Is.EqualTo(budget.StartDate));
-            Assert.That(_budgetService.GetSelectedBudgetEndDate(), Is.EqualTo(budget.EndDate));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_budgetService.GetSelectedBudgetId(), Is.EqualTo(budgetId));
+                Assert.That(_budgetService.GetSelectedBudgetName(), Is.EqualTo(budget.Name));
+                Assert.That(_budgetService.GetSelectedBudgetAmount(), Is.EqualTo(budget.Amount));
+                Assert.That(_budgetService.GetSelectedBudgetStartDate(), Is.EqualTo(budget.StartDate));
+                Assert.That(_budgetService.GetSelectedBudgetEndDate(), Is.EqualTo(budget.EndDate));
+            });
 
             _mockDataStore.Verify(x => x.GetBudgetById(budgetId), Times.Once);
         }
@@ -365,9 +383,9 @@ namespace BudgetTracker.Tests.Services
             var budget = new Budget { Id = 1, UserId = 1, Name = "Test Budget", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m };
             var expenses = new List<Expense>
             {
-                new Expense { Id = 1, BudgetId = 1, Amount = 100m, Description = "Expense 1", Date = DateTime.Now },
-                new Expense { Id = 2, BudgetId = 1, Amount = 200m, Description = "Expense 2", Date = DateTime.Now },
-                new Expense { Id = 3, BudgetId = 1, Amount = 50m, Description = "Expense 3", Date = DateTime.Now }
+                new() { Id = 1, BudgetId = 1, Amount = 100m, Description = "Expense 1", Date = DateTime.Now },
+                new() { Id = 2, BudgetId = 1, Amount = 200m, Description = "Expense 2", Date = DateTime.Now },
+                new() { Id = 3, BudgetId = 1, Amount = 50m, Description = "Expense 3", Date = DateTime.Now }
             };
 
             _mockDataStore.Setup(x => x.GetBudgetById(1)).Returns(budget);
@@ -404,7 +422,7 @@ namespace BudgetTracker.Tests.Services
             var budget = new Budget { Id = 1, UserId = 1, Name = "Test Budget", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m };
             var expenses = new List<Expense>
             {
-                new Expense { Id = 1, BudgetId = 1, Amount = 300m, Description = "Expense 1", Date = DateTime.Now }
+                new() { Id = 1, BudgetId = 1, Amount = 300m, Description = "Expense 1", Date = DateTime.Now }
             };
 
             _mockDataStore.Setup(x => x.GetBudgetById(1)).Returns(budget);
@@ -425,7 +443,7 @@ namespace BudgetTracker.Tests.Services
             var budget = new Budget { Id = 1, UserId = 1, Name = "Test Budget", StartDate = DateTime.Now, EndDate = DateTime.Now.AddDays(30), Amount = 1000m };
             var expenses = new List<Expense>
             {
-                new Expense { Id = 1, BudgetId = 1, Amount = 1200m, Description = "Expensive Item", Date = DateTime.Now }
+                new() { Id = 1, BudgetId = 1, Amount = 1200m, Description = "Expensive Item", Date = DateTime.Now }
             };
 
             _mockDataStore.Setup(x => x.GetBudgetById(1)).Returns(budget);

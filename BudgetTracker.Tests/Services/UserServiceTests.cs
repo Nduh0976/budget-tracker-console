@@ -64,17 +64,17 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.CreateUser(username, name);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"User '{username}' has been successfully created."));
-            Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data.Id, Is.EqualTo(expectedId));
-            Assert.That(result.Data.Username, Is.EqualTo(username));
-            Assert.That(result.Data.Name, Is.EqualTo(name));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"User '{username}' has been successfully created."));
+                Assert.That(result.Data, Is.Not.Null);
+                Assert.That(result.Data.Id, Is.EqualTo(expectedId));
+                Assert.That(result.Data.Username, Is.EqualTo(username));
+                Assert.That(result.Data.Name, Is.EqualTo(name));
+            });
 
-            _mockDataStore.Verify(x => x.AddUser(It.Is<User>(u =>
-                u.Id == expectedId &&
-                u.Username == username &&
-                u.Name == name)), Times.Once);
+            _mockDataStore.Verify(x => x.AddUser(It.Is<User>(u => u.Id == expectedId && u.Username == username && u.Name == name)), Times.Once);
         }
 
         [Test]
@@ -87,9 +87,12 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.CreateUser(invalidUsername, "Test User");
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Username cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Username cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddUser(It.IsAny<User>()), Times.Never);
         }
@@ -104,9 +107,12 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.CreateUser("testuser", invalidName);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Name cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddUser(It.IsAny<User>()), Times.Never);
         }
@@ -122,9 +128,12 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.CreateUser(username, "Test User");
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo($"A user with the username '{username}' already exists."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo($"A user with the username '{username}' already exists."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddUser(It.IsAny<User>()), Times.Never);
         }
@@ -175,8 +184,8 @@ namespace BudgetTracker.Tests.Services
             // Arrange
             var expectedUsers = new List<User>
             {
-                new User { Id = 1, Username = "user1", Name = "User One" },
-                new User { Id = 2, Username = "user2", Name = "User Two" }
+                new() { Id = 1, Username = "user1", Name = "User One" },
+                new() { Id = 2, Username = "user2", Name = "User Two" }
             };
             _mockDataStore.Setup(x => x.GetUsers()).Returns(expectedUsers);
 
@@ -198,8 +207,8 @@ namespace BudgetTracker.Tests.Services
             // Arrange
             var users = new List<User>
             {
-                new User { Id = 1, Username = "user1", Name = "User One" },
-                new User { Id = 2, Username = "user2", Name = "User Two" }
+                new() { Id = 1, Username = "user1", Name = "User One" },
+                new() { Id = 2, Username = "user2", Name = "User Two" }
             };
             _mockDataStore.Setup(x => x.GetUsers()).Returns(users);
 
@@ -261,8 +270,12 @@ namespace BudgetTracker.Tests.Services
             _userService.SetActiveUserById(userId);
 
             // Assert
-            Assert.That(_userService.GetActiveUserId(), Is.EqualTo(expectedUser.Id));
-            Assert.That(_userService.GetActiveUserName(), Is.EqualTo(expectedUser.Name));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_userService.GetActiveUserId(), Is.EqualTo(expectedUser.Id));
+                Assert.That(_userService.GetActiveUserName(), Is.EqualTo(expectedUser.Name));
+            });
+
             _mockDataStore.Verify(x => x.GetUserById(userId), Times.Once);
         }
 
@@ -280,8 +293,11 @@ namespace BudgetTracker.Tests.Services
             _userService.SetActiveUser(user);
 
             // Assert
-            Assert.That(_userService.GetActiveUserId(), Is.EqualTo(user.Id));
-            Assert.That(_userService.GetActiveUserName(), Is.EqualTo(user.Name));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_userService.GetActiveUserId(), Is.EqualTo(user.Id));
+                Assert.That(_userService.GetActiveUserName(), Is.EqualTo(user.Name));
+            });
         }
 
         #endregion
@@ -302,9 +318,13 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.UpdateUser(newName);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"User '{activeUser.Username}' has been successfully updated."));
-            Assert.That(result.Data, Is.EqualTo(activeUser));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"User '{activeUser.Username}' has been successfully updated."));
+                Assert.That(result.Data, Is.EqualTo(activeUser));
+            });
+
             _mockDataStore.Verify(x => x.UpdateNameOfUser(1, newName), Times.Once);
         }
 
@@ -321,9 +341,12 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.UpdateUser(invalidName);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Username cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Username cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateNameOfUser(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
         }
@@ -340,9 +363,12 @@ namespace BudgetTracker.Tests.Services
             var result = _userService.UpdateUser("New Name");
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Username not found."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Username not found."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateNameOfUser(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
         }

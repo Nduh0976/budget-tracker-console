@@ -51,17 +51,23 @@ namespace BudgetTracker.Tests.Services
             // Act
             var result = _expenseService.AddExpense(budgetId, categoryId, description, date, amount);
 
-            // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"Expense '{description}' has been successfully added."));
-            Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data.Id, Is.EqualTo(expectedExpenseId));
-            Assert.That(result.Data.BudgetId, Is.EqualTo(budgetId));
-            Assert.That(result.Data.CategoryId, Is.EqualTo(categoryId));
-            Assert.That(result.Data.Description, Is.EqualTo(description));
-            Assert.That(result.Data.Date, Is.EqualTo(date));
-            Assert.That(result.Data.Amount, Is.EqualTo(amount));
-            Assert.That(result.Data.Category, Is.EqualTo(category));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"Expense '{description}' has been successfully added."));
+                Assert.That(result.Data, Is.Not.Null);
+            });
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Data.Id, Is.EqualTo(expectedExpenseId));
+                Assert.That(result.Data.BudgetId, Is.EqualTo(budgetId));
+                Assert.That(result.Data.CategoryId, Is.EqualTo(categoryId));
+                Assert.That(result.Data.Description, Is.EqualTo(description));
+                Assert.That(result.Data.Date, Is.EqualTo(date));
+                Assert.That(result.Data.Amount, Is.EqualTo(amount));
+                Assert.That(result.Data.Category, Is.EqualTo(category));
+            });
 
             _mockDataStore.Verify(x => x.AddExpense(It.Is<Expense>(e =>
                 e.Id == expectedExpenseId &&
@@ -100,9 +106,12 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.AddExpense(budgetId, categoryId, invalidDescription, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Description cannot be empty or whitespace."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Description cannot be empty or whitespace."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddExpense(It.IsAny<Expense>()), Times.Never);
         }
@@ -114,7 +123,7 @@ namespace BudgetTracker.Tests.Services
             var budgetId = 1;
             var categoryId = 1;
             var description = "Lunch";
-            var date = new DateTime(2024, 5, 31); // Before budget start
+            var date = new DateTime(2024, 5, 31);
             var amount = 25.50m;
 
             var budget = new Budget
@@ -131,10 +140,13 @@ namespace BudgetTracker.Tests.Services
             // Act
             var result = _expenseService.AddExpense(budgetId, categoryId, description, date, amount);
 
-            // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddExpense(It.IsAny<Expense>()), Times.Never);
         }
@@ -146,7 +158,7 @@ namespace BudgetTracker.Tests.Services
             var budgetId = 1;
             var categoryId = 1;
             var description = "Lunch";
-            var date = new DateTime(2024, 7, 1); // After budget end
+            var date = new DateTime(2024, 7, 1);
             var amount = 25.50m;
 
             var budget = new Budget
@@ -164,9 +176,12 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.AddExpense(budgetId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddExpense(It.IsAny<Expense>()), Times.Never);
         }
@@ -195,10 +210,13 @@ namespace BudgetTracker.Tests.Services
             // Act
             var result = _expenseService.AddExpense(budgetId, categoryId, description, date, amount);
 
-            // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.AddExpense(It.IsAny<Expense>()), Times.Never);
         }
@@ -234,8 +252,11 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.AddExpense(budgetId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Data.Amount, Is.EqualTo(0m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Data.Amount, Is.EqualTo(0m));
+            });
         }
 
         #endregion
@@ -279,13 +300,16 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateExpense(expenseId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"Expense '{description}' has been successfully updated."));
-            Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data.CategoryId, Is.EqualTo(categoryId));
-            Assert.That(result.Data.Description, Is.EqualTo(description));
-            Assert.That(result.Data.Date, Is.EqualTo(new DateTime(2024, 6, 15)));
-            Assert.That(result.Data.Amount, Is.EqualTo(30.00m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"Expense '{description}' has been successfully updated."));
+                Assert.That(result.Data, Is.Not.Null);
+                Assert.That(result.Data.CategoryId, Is.EqualTo(categoryId));
+                Assert.That(result.Data.Description, Is.EqualTo(description));
+                Assert.That(result.Data.Date, Is.EqualTo(new DateTime(2024, 6, 15)));
+                Assert.That(result.Data.Amount, Is.EqualTo(30.00m));
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Once);
         }
@@ -327,11 +351,14 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateExpense(expenseId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Data.CategoryId, Is.EqualTo(categoryId)); // This gets updated
-            Assert.That(result.Data.Description, Is.EqualTo("Original Lunch")); // Keeps original
-            Assert.That(result.Data.Date, Is.EqualTo(new DateTime(2024, 6, 10))); // Keeps original
-            Assert.That(result.Data.Amount, Is.EqualTo(25.50m)); // Keeps original
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Data.CategoryId, Is.EqualTo(categoryId));
+                Assert.That(result.Data.Description, Is.EqualTo("Original Lunch"));
+                Assert.That(result.Data.Date, Is.EqualTo(new DateTime(2024, 6, 10)));
+                Assert.That(result.Data.Amount, Is.EqualTo(25.50m));
+            });
         }
 
         [Test]
@@ -341,7 +368,7 @@ namespace BudgetTracker.Tests.Services
             var expenseId = 1;
             var categoryId = 2;
             var description = "Updated Lunch";
-            var date = "31-05-2024"; // Before budget start
+            var date = "31-05-2024";
             var amount = "30,00";
 
             var existingExpense = new Expense
@@ -370,9 +397,12 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateExpense(expenseId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Never);
         }
@@ -413,9 +443,12 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateExpense(expenseId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Never);
         }
@@ -427,7 +460,7 @@ namespace BudgetTracker.Tests.Services
             var expenseId = 1;
             var categoryId = 2;
             var description = "Updated Lunch";
-            var date = "01-07-2024"; // After budget end
+            var date = "01-07-2024";
             var amount = "30,00";
 
             var existingExpense = new Expense
@@ -456,9 +489,12 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateExpense(expenseId, categoryId, description, date, amount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Date must be within budget start and end date."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Never);
         }
@@ -491,10 +527,13 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateBudgetAmount(budgetId, newAmount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Message, Is.EqualTo($"Budget amount for '{budget.Name}' has been successfully updated."));
-            Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data.Amount, Is.EqualTo(1500.00m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Message, Is.EqualTo($"Budget amount for '{budget.Name}' has been successfully updated."));
+                Assert.That(result.Data, Is.Not.Null);
+                Assert.That(result.Data.Amount, Is.EqualTo(1500.00m));
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Once);
         }
@@ -523,8 +562,11 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateBudgetAmount(budgetId, newAmount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Data.Amount, Is.EqualTo(1000m)); // Keeps original amount
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Data.Amount, Is.EqualTo(1000m));
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Once);
         }
@@ -552,9 +594,12 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateBudgetAmount(budgetId, newAmount);
 
             // Assert
-            Assert.That(result.Success, Is.False);
-            Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
-            Assert.That(result.Data, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.False);
+                Assert.That(result.Message, Is.EqualTo("Amount cannot be negative."));
+                Assert.That(result.Data, Is.Null);
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Never);
         }
@@ -583,8 +628,11 @@ namespace BudgetTracker.Tests.Services
             var result = _expenseService.UpdateBudgetAmount(budgetId, newAmount);
 
             // Assert
-            Assert.That(result.Success, Is.True);
-            Assert.That(result.Data.Amount, Is.EqualTo(0m));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Success, Is.True);
+                Assert.That(result.Data.Amount, Is.EqualTo(0m));
+            });
 
             _mockDataStore.Verify(x => x.UpdateData(), Times.Once);
         }
@@ -634,8 +682,8 @@ namespace BudgetTracker.Tests.Services
             var budgetId = 1;
             var expectedExpenses = new List<Expense>
             {
-                new Expense { Id = 1, BudgetId = budgetId, Description = "Lunch", Amount = 25.50m },
-                new Expense { Id = 2, BudgetId = budgetId, Description = "Dinner", Amount = 35.00m }
+                new() { Id = 1, BudgetId = budgetId, Description = "Lunch", Amount = 25.50m },
+                new() { Id = 2, BudgetId = budgetId, Description = "Dinner", Amount = 35.00m }
             };
 
             _mockDataStore.Setup(x => x.GetExpensesByBudgetId(budgetId)).Returns(expectedExpenses);
@@ -645,9 +693,12 @@ namespace BudgetTracker.Tests.Services
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(2));
-            Assert.That(result.First().Description, Is.EqualTo("Lunch"));
-            Assert.That(result.Last().Description, Is.EqualTo("Dinner"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Count(), Is.EqualTo(2));
+                Assert.That(result.First().Description, Is.EqualTo("Lunch"));
+                Assert.That(result.Last().Description, Is.EqualTo("Dinner"));
+            });
 
             _mockDataStore.Verify(x => x.GetExpensesByBudgetId(budgetId), Times.Once);
         }
