@@ -1436,7 +1436,7 @@ namespace BudgetTracker.Services
 
                     input = input.Trim();
 
-                    if (!decimal.TryParse(input, out var amount))
+                    if (!decimal.TryParse(input, CultureInfo.InvariantCulture, out var amount))
                     {
                         _loggingService.LogWarning($"Invalid decimal format entered: {input}");
                         _menuDisplayService.DisplayMessageAndWait("Invalid amount format. Please enter a valid number (e.g., 25.50).");
