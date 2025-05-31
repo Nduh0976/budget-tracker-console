@@ -1,310 +1,334 @@
 {
-    "Users": [
-        {
-            "Id": 1,
-            "Username": "JohnD",
-            "Name": "John Doe"
-        },
-        {
-            "Id": 2,
-            "Username": "JaneS",
-            "Name": "Jane Smith"
-        },
-        {
-            "Id": 3,
-            "Username": "Ndu",
-            "Name": "Ndumiso M"
-        },
-        {
-            "Id": 4,
-            "Username": "Nae",
-            "Name": "Natalie"
-        },
-        {
-            "Id": 5,
-            "Username": "Sah",
-            "Name": "Sanele M"
-        },
-        {
-            "Id": 6,
-            "Username": "Bean",
-            "Name": "Johnny English"
-        },
-        {
-            "Id": 7,
-            "Username": "ClintE",
-            "Name": "Clint Eastwood"
-        },
-        {
-            "Id": 8,
-            "Username": "DeleteUser",
-            "Name": "Delete User"
-        },
-        {
-            "Id": 9,
-            "Username": "SamR",
-            "Name": "Sam Roberts"
-        },
-        {
-            "Id": 10,
-            "Username": "LisaG",
-            "Name": "Lisa Green"
-        },
-        {
-            "Id": 11,
-            "Username": "MaxP",
-            "Name": "Max Payne"
-        },
-        {
-            "Id": 12,
-            "Username": "EveL",
-            "Name": "Evelyn Lopez"
-        }
-    ],
-    "Budgets": [
-        {
-            "Id": 1,
-            "UserId": 1,
-            "Name": "Jan 2025 Monthly Budget",
-            "StartDate": "2025-01-01T00:00:00",
-            "EndDate": "2025-01-31T00:00:00",
-            "Amount": 2000.00
-        },
-        {
-            "Id": 2,
-            "UserId": 2,
-            "Name": "Life Expenses",
-            "StartDate": "2025-01-01T00:00:00",
-            "EndDate": "2025-01-31T00:00:00",
-            "Amount": 1500.00
-        },
-        {
-            "Id": 3,
-            "UserId": 1,
-            "Name": "Feb 2025",
-            "StartDate": "2025-02-01T00:00:00",
-            "EndDate": "2025-02-28T00:00:00",
-            "Amount": 60000.0
-        },
-        {
-            "Id": 4,
-            "UserId": 8,
-            "Name": "Jan 2025",
-            "StartDate": "2025-01-01T00:00:00",
-            "EndDate": "2025-01-31T00:00:00",
-            "Amount": 5000.0
-        },
-        {
-            "Id": 5,
-            "UserId": 9,
-            "Name": "Feb 2025 Personal Budget",
-            "StartDate": "2025-02-01T00:00:00",
-            "EndDate": "2025-02-28T00:00:00",
-            "Amount": 4000.0
-        },
-        {
-            "Id": 6,
-            "UserId": 10,
-            "Name": "Holiday Fund",
-            "StartDate": "2025-06-01T00:00:00",
-            "EndDate": "2025-06-30T00:00:00",
-            "Amount": 10000.0
-        },
-        {
-            "Id": 7,
-            "UserId": 11,
-            "Name": "March 2025 Budget",
-            "StartDate": "2025-03-01T00:00:00",
-            "EndDate": "2025-03-31T00:00:00",
-            "Amount": 5000.0
-        },
-        {
-            "Id": 8,
-            "UserId": 12,
-            "Name": "April 2025 Vacation Budget",
-            "StartDate": "2025-04-01T00:00:00",
-            "EndDate": "2025-04-30T00:00:00",
-            "Amount": 12000.0
-        }
-    ],
-    "Categories": [
-        {
-            "Id": 1,
-            "Name": "Food"
-        },
-        {
-            "Id": 2,
-            "Name": "Rent"
-        },
-        {
-            "Id": 3,
-            "Name": "Transportation"
-        },
-        {
-            "Id": 4,
-            "Name": "Entertainment"
-        },
-        {
-            "Id": 5,
-            "Name": "Health"
-        },
-        {
-            "Id": 6,
-            "Name": "Utilities"
-        }
-    ],
-    "Expenses": [
-        {
-            "Id": 1,
-            "BudgetId": 1,
-            "CategoryId": 1,
-            "Amount": 50.0,
-            "Date": "2025-01-05T00:00:00",
-            "Description": "Lunch"
-        },
-        {
-            "Id": 2,
-            "BudgetId": 2,
-            "CategoryId": 2,
-            "Amount": 500.0,
-            "Date": "2025-01-10T00:00:00",
-            "Description": "Rent Payment"
-        },
-        {
-            "Id": 3,
-            "BudgetId": 1,
-            "CategoryId": 1,
-            "Amount": 450.0,
-            "Date": "2025-01-15T00:00:00",
-            "Description": "Top up"
-        },
-        {
-            "Id": 4,
-            "BudgetId": 4,
-            "CategoryId": 1,
-            "Amount": 150.0,
-            "Date": "2025-01-03T00:00:00",
-            "Description": "Groceries"
-        },
-        {
-            "Id": 5,
-            "BudgetId": 4,
-            "CategoryId": 2,
-            "Amount": 1200.0,
-            "Date": "2025-01-07T00:00:00",
-            "Description": "House Rent"
-        },
-        {
-            "Id": 6,
-            "BudgetId": 4,
-            "CategoryId": 3,
-            "Amount": 300.0,
-            "Date": "2025-01-10T00:00:00",
-            "Description": "Gas Refill"
-        },
-        {
-            "Id": 7,
-            "BudgetId": 5,
-            "CategoryId": 4,
-            "Amount": 200.0,
-            "Date": "2025-02-05T00:00:00",
-            "Description": "Movie Tickets"
-        },
-        {
-            "Id": 8,
-            "BudgetId": 5,
-            "CategoryId": 1,
-            "Amount": 250.0,
-            "Date": "2025-02-12T00:00:00",
-            "Description": "Dinner Out"
-        },
-        {
-            "Id": 9,
-            "BudgetId": 6,
-            "CategoryId": 3,
-            "Amount": 100.0,
-            "Date": "2025-03-02T00:00:00",
-            "Description": "Bus Fare"
-        },
-        {
-            "Id": 10,
-            "BudgetId": 6,
-            "CategoryId": 2,
-            "Amount": 500.0,
-            "Date": "2025-03-05T00:00:00",
-            "Description": "Apartment Maintenance"
-        },
-        {
-            "Id": 11,
-            "BudgetId": 1,
-            "CategoryId": 3,
-            "Amount": 365.0,
-            "Date": "2025-01-12T00:00:00",
-            "Description": "New Expense Updated"
-        },
-        {
-            "Id": 12,
-            "BudgetId": 5,
-            "CategoryId": 5,
-            "Amount": 300.0,
-            "Date": "2025-02-05T00:00:00",
-            "Description": "Doctor's Visit"
-        },
-        {
-            "Id": 13,
-            "BudgetId": 5,
-            "CategoryId": 4,
-            "Amount": 450.0,
-            "Date": "2025-02-20T00:00:00",
-            "Description": "Concert Ticket"
-        },
-        {
-            "Id": 14,
-            "BudgetId": 6,
-            "CategoryId": 6,
-            "Amount": 1200.0,
-            "Date": "2025-06-01T00:00:00",
-            "Description": "Utility Bills"
-        },
-        {
-            "Id": 15,
-            "BudgetId": 6,
-            "CategoryId": 1,
-            "Amount": 800.0,
-            "Date": "2025-06-15T00:00:00",
-            "Description": "Grocery Shopping"
-        },
-        {
-            "Id": 16,
-            "BudgetId": 7,
-            "CategoryId": 2,
-            "Amount": 2000.0,
-            "Date": "2025-03-05T00:00:00",
-            "Description": "Monthly Rent"
-        },
-        {
-            "Id": 17,
-            "BudgetId": 7,
-            "CategoryId": 1,
-            "Amount": 700.0,
-            "Date": "2025-03-10T00:00:00",
-            "Description": "Groceries"
-        },
-        {
-            "Id": 18,
-            "BudgetId": 8,
-            "CategoryId": 4,
-            "Amount": 5000.0,
-            "Date": "2025-04-05T00:00:00",
-            "Description": "Flight Tickets"
-        },
-        {
-            "Id": 19,
-            "BudgetId": 8,
-            "CategoryId": 1,
-            "Amount": 2000.0,
-            "Date": "2025-04-12T00:00:00",
-            "Description": "Restaurant Dinners"
-        }
-    ]
+  "Users": [
+    {
+      "Id": 1,
+      "Username": "JohnD",
+      "Name": "John Doe"
+    },
+    {
+      "Id": 2,
+      "Username": "JaneS",
+      "Name": "Jane Smith"
+    },
+    {
+      "Id": 3,
+      "Username": "Ndu",
+      "Name": "Ndumiso M"
+    },
+    {
+      "Id": 4,
+      "Username": "Nae",
+      "Name": "Natalie"
+    },
+    {
+      "Id": 5,
+      "Username": "Sah",
+      "Name": "Sanele M"
+    },
+    {
+      "Id": 6,
+      "Username": "Bean",
+      "Name": "Johnny English"
+    },
+    {
+      "Id": 7,
+      "Username": "ClintE",
+      "Name": "Clint Eastwood"
+    },
+    {
+      "Id": 8,
+      "Username": "DeleteUser",
+      "Name": "Delete User"
+    },
+    {
+      "Id": 9,
+      "Username": "SamR",
+      "Name": "Sam Roberts"
+    },
+    {
+      "Id": 10,
+      "Username": "LisaG",
+      "Name": "Lisa Green"
+    },
+    {
+      "Id": 11,
+      "Username": "MaxP",
+      "Name": "Max Payne"
+    },
+    {
+      "Id": 12,
+      "Username": "EveL",
+      "Name": "Evelyn Lopez"
+    }
+  ],
+  "Budgets": [
+    {
+      "Id": 1,
+      "UserId": 1,
+      "Name": "Jan 2025 Monthly Budget",
+      "StartDate": "2025-01-01T00:00:00",
+      "EndDate": "2025-01-31T00:00:00",
+      "Amount": 2000.00
+    },
+    {
+      "Id": 2,
+      "UserId": 2,
+      "Name": "Life Expenses",
+      "StartDate": "2025-01-01T00:00:00",
+      "EndDate": "2025-01-31T00:00:00",
+      "Amount": 1500.00
+    },
+    {
+      "Id": 3,
+      "UserId": 1,
+      "Name": "Feb 2025",
+      "StartDate": "2025-02-01T00:00:00",
+      "EndDate": "2025-02-28T00:00:00",
+      "Amount": 60000.0
+    },
+    {
+      "Id": 4,
+      "UserId": 8,
+      "Name": "Jan 2025",
+      "StartDate": "2025-01-01T00:00:00",
+      "EndDate": "2025-01-31T00:00:00",
+      "Amount": 5000.0
+    },
+    {
+      "Id": 5,
+      "UserId": 9,
+      "Name": "Feb 2025 Personal Budget",
+      "StartDate": "2025-02-01T00:00:00",
+      "EndDate": "2025-02-28T00:00:00",
+      "Amount": 4000.0
+    },
+    {
+      "Id": 6,
+      "UserId": 10,
+      "Name": "Holiday Fund",
+      "StartDate": "2025-06-01T00:00:00",
+      "EndDate": "2025-06-30T00:00:00",
+      "Amount": 10000.0
+    },
+    {
+      "Id": 7,
+      "UserId": 11,
+      "Name": "March 2025 Budget",
+      "StartDate": "2025-03-01T00:00:00",
+      "EndDate": "2025-03-31T00:00:00",
+      "Amount": 5000.0
+    },
+    {
+      "Id": 8,
+      "UserId": 12,
+      "Name": "April 2025 Vacation Budget",
+      "StartDate": "2025-04-01T00:00:00",
+      "EndDate": "2025-04-30T00:00:00",
+      "Amount": 12000.0
+    },
+    {
+      "Id": 9,
+      "UserId": 3,
+      "Name": "May 2025 Budget",
+      "StartDate": "2025-05-01T00:00:00",
+      "EndDate": "2025-05-31T00:00:00",
+      "Amount": 10000.0
+    }
+  ],
+  "Categories": [
+    {
+      "Id": 1,
+      "Name": "Food"
+    },
+    {
+      "Id": 2,
+      "Name": "Rent"
+    },
+    {
+      "Id": 3,
+      "Name": "Transportation"
+    },
+    {
+      "Id": 4,
+      "Name": "Entertainment"
+    },
+    {
+      "Id": 5,
+      "Name": "Health"
+    },
+    {
+      "Id": 6,
+      "Name": "Utilities"
+    }
+  ],
+  "Expenses": [
+    {
+      "Id": 1,
+      "BudgetId": 1,
+      "CategoryId": 1,
+      "Amount": 50.0,
+      "Date": "2025-01-05T00:00:00",
+      "Description": "Lunch"
+    },
+    {
+      "Id": 2,
+      "BudgetId": 2,
+      "CategoryId": 2,
+      "Amount": 500.0,
+      "Date": "2025-01-10T00:00:00",
+      "Description": "Rent Payment"
+    },
+    {
+      "Id": 3,
+      "BudgetId": 1,
+      "CategoryId": 1,
+      "Amount": 450.0,
+      "Date": "2025-01-15T00:00:00",
+      "Description": "Top up"
+    },
+    {
+      "Id": 4,
+      "BudgetId": 4,
+      "CategoryId": 1,
+      "Amount": 150.0,
+      "Date": "2025-01-03T00:00:00",
+      "Description": "Groceries"
+    },
+    {
+      "Id": 5,
+      "BudgetId": 4,
+      "CategoryId": 2,
+      "Amount": 1200.0,
+      "Date": "2025-01-07T00:00:00",
+      "Description": "House Rent"
+    },
+    {
+      "Id": 6,
+      "BudgetId": 4,
+      "CategoryId": 3,
+      "Amount": 300.0,
+      "Date": "2025-01-10T00:00:00",
+      "Description": "Gas Refill"
+    },
+    {
+      "Id": 7,
+      "BudgetId": 5,
+      "CategoryId": 4,
+      "Amount": 200.0,
+      "Date": "2025-02-05T00:00:00",
+      "Description": "Movie Tickets"
+    },
+    {
+      "Id": 8,
+      "BudgetId": 5,
+      "CategoryId": 1,
+      "Amount": 250.0,
+      "Date": "2025-02-12T00:00:00",
+      "Description": "Dinner Out"
+    },
+    {
+      "Id": 9,
+      "BudgetId": 6,
+      "CategoryId": 3,
+      "Amount": 100.0,
+      "Date": "2025-03-02T00:00:00",
+      "Description": "Bus Fare"
+    },
+    {
+      "Id": 10,
+      "BudgetId": 6,
+      "CategoryId": 2,
+      "Amount": 500.0,
+      "Date": "2025-03-05T00:00:00",
+      "Description": "Apartment Maintenance"
+    },
+    {
+      "Id": 11,
+      "BudgetId": 1,
+      "CategoryId": 3,
+      "Amount": 365.0,
+      "Date": "2025-01-12T00:00:00",
+      "Description": "New Expense Updated"
+    },
+    {
+      "Id": 12,
+      "BudgetId": 5,
+      "CategoryId": 5,
+      "Amount": 300.0,
+      "Date": "2025-02-05T00:00:00",
+      "Description": "Doctor's Visit"
+    },
+    {
+      "Id": 13,
+      "BudgetId": 5,
+      "CategoryId": 4,
+      "Amount": 450.0,
+      "Date": "2025-02-20T00:00:00",
+      "Description": "Concert Ticket"
+    },
+    {
+      "Id": 14,
+      "BudgetId": 6,
+      "CategoryId": 6,
+      "Amount": 1200.0,
+      "Date": "2025-06-01T00:00:00",
+      "Description": "Utility Bills"
+    },
+    {
+      "Id": 15,
+      "BudgetId": 6,
+      "CategoryId": 1,
+      "Amount": 800.0,
+      "Date": "2025-06-15T00:00:00",
+      "Description": "Grocery Shopping"
+    },
+    {
+      "Id": 16,
+      "BudgetId": 7,
+      "CategoryId": 2,
+      "Amount": 2000.0,
+      "Date": "2025-03-05T00:00:00",
+      "Description": "Monthly Rent"
+    },
+    {
+      "Id": 17,
+      "BudgetId": 7,
+      "CategoryId": 1,
+      "Amount": 700.0,
+      "Date": "2025-03-10T00:00:00",
+      "Description": "Groceries"
+    },
+    {
+      "Id": 18,
+      "BudgetId": 8,
+      "CategoryId": 4,
+      "Amount": 5000.0,
+      "Date": "2025-04-05T00:00:00",
+      "Description": "Flight Tickets"
+    },
+    {
+      "Id": 19,
+      "BudgetId": 8,
+      "CategoryId": 1,
+      "Amount": 2000.0,
+      "Date": "2025-04-12T00:00:00",
+      "Description": "Restaurant Dinners"
+    },
+    {
+      "Id": 20,
+      "BudgetId": 9,
+      "CategoryId": 1,
+      "Amount": 1500.0,
+      "Date": "2025-05-01T00:00:00",
+      "Description": "Food"
+    },
+    {
+      "Id": 21,
+      "BudgetId": 9,
+      "CategoryId": 3,
+      "Amount": 1350.31,
+      "Date": "2025-05-08T00:00:00",
+      "Description": "Car Parts"
+    }
+  ]
 }
